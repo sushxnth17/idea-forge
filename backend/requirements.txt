@@ -1,7 +1,7 @@
-fastapi
-uvicorn
-sqlalchemy
-psycopg2-binary
-python-dotenv
-passlib[bcrypt]
-python-jose
+fastapi # web framework for building APIs
+uvicorn # ASGI server for running FastAPI applications
+sqlalchemy   # helps with database interactions
+psycopg2-binary  # PostgreSQL adapter for Python
+python-dotenv #loads environment variables from .env file
+passlib[bcrypt] # password hashing
+python-jose # JSON Web Token (JWT) implementation
