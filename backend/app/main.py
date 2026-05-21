@@ -2,9 +2,11 @@ from fastapi import FastAPI
 
 from .database import Base, engine
 from . import models
+from .routes.users import router as users_router
 
 
 app = FastAPI()
+app.include_router(users_router, prefix="/users", tags=["Users"])
 
 
 @app.on_event("startup")
