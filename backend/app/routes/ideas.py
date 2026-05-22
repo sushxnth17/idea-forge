@@ -64,3 +64,122 @@ def get_ideas(
 	)
 
 	return ideas
+
+@router.get("/ideas/{idea_id}", response_model=IdeaResponse)
+def get_single_idea(
+	idea_id: int,
+	token: str = Depends(oauth2_scheme),
+	db: Session = Depends(get_db),
+):
+	email = verify_access_token(token)
+
+	current_user = (
+		db.query(User)
+		.filter(User.email == email)
+		.first()
+	)
+
+	if current_user is None:
+		raise HTTPException(
+			status_code=status.HTTP_401_UNAUTHORIZED,
+			detail="User not found",
+		)
+
+	idea = (
+		db.query(Idea)
+		.filter(
+			Idea.id == idea_id,
+			Idea.owner_id == current_user.id,
+		)
+		.first()
+	)
+
+	if idea is None:
+		raise HTTPException(
+			status_code=status.HTTP_404_NOT_FOUND,
+			detail="Idea not found",
+		)
+
+	return idea
+
+@router.put("/ideas/{idea_id}", response_model=IdeaResponse)
+def update_idea(
+	idea_id: int,
+	updated_idea: IdeaCreate,
+	token: str = Depends(oauth2_scheme),
+	db: Session = Depends(get_db),
+):
+	email = verify_access_token(token)
+
+	current_user = (
+		db.query(User)
+		.filter(User.email == email)
+		.first()
+	)
+
+	if current_user is None:
+		raise HTTPException(
+			status_code=status.HTTP_401_UNAUTHORIZED,
+			detail="User not found",
+		)
+
+	idea = (
+		db.query(Idea)
+		.filter(
+			Idea.id == idea_id,
+			Idea.owner_id == current_user.id,
+		)
+		.first()
+	)
+
+	if idea is None:
+		raise HTTPException(
+			status_code=status.HTTP_404_NOT_FOUND,
+			detail="Idea not found",
+		)
+
+	idea.title = updated_idea.title
+	idea.description = updated_idea.description
+
+	db.commit()
+	db.refresh(idea)
+
+	return idea
+
+@router.delete("/ideas/{idea_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_idea(
+	idea_id: int,
+	token: str = Depends(oauth2_scheme),
+	db: Session = Depends(get_db),
+):
+	email = verify_access_token(token)
+
+	current_user = (
+		db.query(User)
+		.filter(User.email == email)
+		.first()
+	)
+
+	if current_user is None:
+		raise HTTPException(
+			status_code=status.HTTP_401_UNAUTHORIZED,
+			detail="User not found",
+		)
+
+	idea = (
+		db.query(Idea)
+		.filter(
+			Idea.id == idea_id,
+			Idea.owner_id == current_user.id,
+		)
+		.first()
+	)
+
+	if idea is None:
+		raise HTTPException(
+			status_code=status.HTTP_404_NOT_FOUND,
+			detail="Idea not found",
+		)
+
+	db.delete(idea)
+	db.commit()
