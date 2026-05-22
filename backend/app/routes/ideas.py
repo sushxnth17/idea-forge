@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from ..auth import oauth2_scheme, verify_access_token
+from ..auth import get_current_user
 from ..database import get_db
 from ..models import Idea, User
 from ..schemas import IdeaCreate, IdeaResponse
@@ -13,17 +13,9 @@ router = APIRouter()
 @router.post("/ideas", response_model=IdeaResponse, status_code=status.HTTP_201_CREATED)
 def create_idea(
 	idea: IdeaCreate,
-	token: str = Depends(oauth2_scheme),
+	current_user: User = Depends(get_current_user),
 	db: Session = Depends(get_db),
 ):
-	email = verify_access_token(token)
-	current_user = db.query(User).filter(User.email == email).first()
-
-	if current_user is None:
-		raise HTTPException(
-			status_code=status.HTTP_401_UNAUTHORIZED,
-			detail="User not found",
-		)
 
 	new_idea = Idea(
 		title=idea.title,
@@ -39,23 +31,9 @@ def create_idea(
 
 @router.get("/ideas", response_model=list[IdeaResponse])
 def get_ideas(
-	token: str = Depends(oauth2_scheme),
+	current_user: User = Depends(get_current_user),
 	db: Session = Depends(get_db),
 ):
-	email = verify_access_token(token)
-
-	current_user = (
-		db.query(User)
-		.filter(User.email == email)
-		.first()
-	)
-
-	if current_user is None:
-		raise HTTPException(
-			status_code=status.HTTP_401_UNAUTHORIZED,
-			detail="User not found",
-		)
-
 	ideas = (
 		db.query(Idea)
 		.filter(Idea.owner_id == current_user.id)
@@ -68,23 +46,9 @@ def get_ideas(
 @router.get("/ideas/{idea_id}", response_model=IdeaResponse)
 def get_single_idea(
 	idea_id: int,
-	token: str = Depends(oauth2_scheme),
+	current_user: User = Depends(get_current_user),
 	db: Session = Depends(get_db),
 ):
-	email = verify_access_token(token)
-
-	current_user = (
-		db.query(User)
-		.filter(User.email == email)
-		.first()
-	)
-
-	if current_user is None:
-		raise HTTPException(
-			status_code=status.HTTP_401_UNAUTHORIZED,
-			detail="User not found",
-		)
-
 	idea = (
 		db.query(Idea)
 		.filter(
@@ -106,23 +70,9 @@ def get_single_idea(
 def update_idea(
 	idea_id: int,
 	updated_idea: IdeaCreate,
-	token: str = Depends(oauth2_scheme),
+	current_user: User = Depends(get_current_user),
 	db: Session = Depends(get_db),
 ):
-	email = verify_access_token(token)
-
-	current_user = (
-		db.query(User)
-		.filter(User.email == email)
-		.first()
-	)
-
-	if current_user is None:
-		raise HTTPException(
-			status_code=status.HTTP_401_UNAUTHORIZED,
-			detail="User not found",
-		)
-
 	idea = (
 		db.query(Idea)
 		.filter(
@@ -149,23 +99,9 @@ def update_idea(
 @router.delete("/ideas/{idea_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_idea(
 	idea_id: int,
-	token: str = Depends(oauth2_scheme),
+	current_user: User = Depends(get_current_user),
 	db: Session = Depends(get_db),
 ):
-	email = verify_access_token(token)
-
-	current_user = (
-		db.query(User)
-		.filter(User.email == email)
-		.first()
-	)
-
-	if current_user is None:
-		raise HTTPException(
-			status_code=status.HTTP_401_UNAUTHORIZED,
-			detail="User not found",
-		)
-
 	idea = (
 		db.query(Idea)
 		.filter(
