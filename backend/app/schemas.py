@@ -17,6 +17,21 @@ class UserResponse(BaseModel):
 
 	model_config = ConfigDict(from_attributes=True)
 
+
+class IdeaCreate(BaseModel):
+	title: str
+	description: str
+
+
+class IdeaResponse(BaseModel):
+	id: int
+	title: str
+	description: str
+	created_at: datetime
+	owner_id: int
+
+	model_config = ConfigDict(from_attributes=True)
+
 class UserLogin(BaseModel):
 	email: str
 	password: str
