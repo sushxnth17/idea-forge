@@ -36,3 +36,31 @@ def create_idea(
 	db.refresh(new_idea)
 
 	return new_idea
+
+@router.get("/ideas", response_model=list[IdeaResponse])
+def get_ideas(
+	token: str = Depends(oauth2_scheme),
+	db: Session = Depends(get_db),
+):
+	email = verify_access_token(token)
+
+	current_user = (
+		db.query(User)
+		.filter(User.email == email)
+		.first()
+	)
+
+	if current_user is None:
+		raise HTTPException(
+			status_code=status.HTTP_401_UNAUTHORIZED,
+			detail="User not found",
+		)
+
+	ideas = (
+		db.query(Idea)
+		.filter(Idea.owner_id == current_user.id)
+		.order_by(Idea.created_at.desc())
+		.all()
+	)
+
+	return ideas
