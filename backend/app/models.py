@@ -1,7 +1,13 @@
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, func
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, Table, func
 from sqlalchemy.orm import relationship
-
 from .database import Base
+
+idea_tags = Table(
+	"idea_tags",
+	Base.metadata,
+	Column("idea_id", ForeignKey("ideas.id"), primary_key=True),
+	Column("tag_id", ForeignKey("tags.id"), primary_key=True),
+)
 
 
 class User(Base):
@@ -25,3 +31,17 @@ class Idea(Base):
 	created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 	owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 	owner = relationship("User", back_populates="ideas")
+	tags = relationship("Tag", secondary=idea_tags, back_populates="ideas")
+
+
+class Tag(Base):
+	__tablename__ = "tags"
+
+	id = Column(Integer, primary_key=True, index=True)
+	name = Column(String, unique=True, nullable=False)
+
+	ideas = relationship(
+		"Idea",
+		secondary=idea_tags,
+		back_populates="tags"
+	)

@@ -17,11 +17,17 @@ class UserResponse(BaseModel):
 
 	model_config = ConfigDict(from_attributes=True)
 
+class TagResponse(BaseModel):
+	id: int
+	name: str
 
+	model_config = ConfigDict(from_attributes=True)
+	
 class IdeaCreate(BaseModel):
 	title: str
 	description: str
 	is_public: bool = False
+	tags: list[str] = []
 
 
 class IdeaResponse(BaseModel):
@@ -29,6 +35,7 @@ class IdeaResponse(BaseModel):
 	title: str
 	description: str
 	is_public: bool
+	tags: list[TagResponse]
 	created_at: datetime
 	owner_id: int
 

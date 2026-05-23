@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from ..auth import get_current_user
 from ..database import get_db
-from ..models import Idea, User
+from ..models import Idea, User, Tag
 from ..schemas import IdeaCreate, IdeaResponse
 
 
@@ -23,6 +23,20 @@ def create_idea(
 		is_public=idea.is_public,
 		owner_id=current_user.id,
 	)
+
+	for tag_name in idea.tags:
+		tag = (
+			db.query(Tag)
+			.filter(Tag.name == tag_name)
+			.first()
+		)
+
+		if not tag:
+			tag = Tag(name=tag_name)
+			db.add(tag)
+			db.flush()
+
+		new_idea.tags.append(tag)
 
 	db.add(new_idea)
 	db.commit()
@@ -134,3 +148,20 @@ def get_public_feed(
 	)
 
 	return public_ideas
+
+@router.get("/search/{tag_name}", response_model=list[IdeaResponse])
+def search_by_tag(
+	tag_name: str,
+	db: Session = Depends(get_db),
+):
+	ideas = (
+		db.query(Idea)
+		.join(Idea.tags)
+		.filter(
+			Tag.name.ilike(tag_name),
+			Idea.is_public == True
+		)
+		.all()
+	)
+
+	return ideas
