@@ -36,6 +36,7 @@ class IdeaResponse(BaseModel):
 	description: str
 	is_public: bool
 	tags: list[TagResponse]
+	likes_count: int = 0
 	created_at: datetime
 	owner_id: int
 

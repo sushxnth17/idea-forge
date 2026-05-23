@@ -19,6 +19,7 @@ class User(Base):
 	hashed_password = Column(String, nullable=False)
 	created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 	ideas = relationship("Idea", back_populates="owner", cascade="all, delete-orphan")
+	likes = relationship("Like", back_populates="user", cascade="all, delete-orphan")
 
 
 class Idea(Base):
@@ -32,7 +33,11 @@ class Idea(Base):
 	owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 	owner = relationship("User", back_populates="ideas")
 	tags = relationship("Tag", secondary=idea_tags, back_populates="ideas")
+	likes = relationship("Like", back_populates="idea", cascade="all, delete-orphan")
 
+	@property
+	def likes_count(self):
+		return len(self.likes)
 
 class Tag(Base):
 	__tablename__ = "tags"
@@ -44,4 +49,31 @@ class Tag(Base):
 		"Idea",
 		secondary=idea_tags,
 		back_populates="tags"
+	)
+
+class Like(Base):
+	__tablename__ = "likes"
+
+	id = Column(Integer, primary_key=True, index=True)
+
+	user_id = Column(
+		Integer,
+		ForeignKey("users.id"),
+		nullable=False
+	)
+
+	idea_id = Column(
+		Integer,
+		ForeignKey("ideas.id"),
+		nullable=False
+	)
+
+	user = relationship(
+		"User",
+		back_populates="likes"
+	)
+
+	idea = relationship(
+		"Idea",
+		back_populates="likes"
 	)

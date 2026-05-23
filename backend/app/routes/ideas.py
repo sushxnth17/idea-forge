@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from ..auth import get_current_user
 from ..database import get_db
-from ..models import Idea, User, Tag
+from ..models import Idea, User, Tag, Like
 from ..schemas import IdeaCreate, IdeaResponse
 
 
@@ -165,3 +165,41 @@ def search_by_tag(
 	)
 
 	return ideas
+
+@router.post("/ideas/{idea_id}/like")
+def like_idea(
+	idea_id: int,
+	current_user: User = Depends(get_current_user),
+	db: Session = Depends(get_db),
+):
+	idea = db.query(Idea).filter(
+		Idea.id == idea_id,
+		Idea.is_public == True
+	).first()
+
+	if not idea:
+		raise HTTPException(
+			status_code=status.HTTP_404_NOT_FOUND,
+			detail="Idea not found",
+		)
+
+	existing_like = db.query(Like).filter(
+		Like.user_id == current_user.id,
+		Like.idea_id == idea_id
+	).first()
+
+	if existing_like:
+		raise HTTPException(
+			status_code=status.HTTP_400_BAD_REQUEST,
+			detail="Already liked",
+		)
+
+	new_like = Like(
+		user_id=current_user.id,
+		idea_id=idea_id
+	)
+
+	db.add(new_like)
+	db.commit()
+
+	return {"message": "Idea liked successfully"}
