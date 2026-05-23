@@ -20,6 +20,7 @@ def create_idea(
 	new_idea = Idea(
 		title=idea.title,
 		description=idea.description,
+		is_public=idea.is_public,
 		owner_id=current_user.id,
 	)
 
@@ -90,6 +91,7 @@ def update_idea(
 
 	idea.title = updated_idea.title
 	idea.description = updated_idea.description
+	idea.is_public = updated_idea.is_public
 
 	db.commit()
 	db.refresh(idea)
@@ -119,3 +121,16 @@ def delete_idea(
 
 	db.delete(idea)
 	db.commit()
+
+@router.get("/feed", response_model=list[IdeaResponse])
+def get_public_feed(
+	db: Session = Depends(get_db),
+):
+	public_ideas = (
+		db.query(Idea)
+		.filter(Idea.is_public == True)
+		.order_by(Idea.created_at.desc())
+		.all()
+	)
+
+	return public_ideas

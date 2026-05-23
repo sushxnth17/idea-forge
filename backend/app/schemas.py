@@ -21,12 +21,14 @@ class UserResponse(BaseModel):
 class IdeaCreate(BaseModel):
 	title: str
 	description: str
+	is_public: bool = False
 
 
 class IdeaResponse(BaseModel):
 	id: int
 	title: str
 	description: str
+	is_public: bool
 	created_at: datetime
 	owner_id: int
 
