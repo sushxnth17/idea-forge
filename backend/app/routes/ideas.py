@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 
 from ..auth import get_current_user
 from ..database import get_db
-from ..models import Idea, User, Tag, Like, Comment
-from ..schemas import (IdeaCreate,IdeaResponse,CommentCreate,CommentResponse,)
+from ..models import Idea, User, Tag, Like, Comment,Bookmark
+from ..schemas import (IdeaCreate,IdeaResponse,CommentCreate,CommentResponse, BookmarkResponse)
 
 
 router = APIRouter()
@@ -274,3 +274,65 @@ def remix_idea(
 	db.refresh(new_idea)
 
 	return new_idea
+
+@router.post(
+	"/ideas/{idea_id}/bookmark",
+	response_model=BookmarkResponse,
+	status_code=status.HTTP_201_CREATED
+)
+def bookmark_idea(
+	idea_id: int,
+	current_user: User = Depends(get_current_user),
+	db: Session = Depends(get_db),
+):
+	idea = db.query(Idea).filter(
+		Idea.id == idea_id
+	).first()
+
+	if not idea:
+		raise HTTPException(
+			status_code=status.HTTP_404_NOT_FOUND,
+			detail="Idea not found"
+		)
+
+	existing_bookmark = db.query(Bookmark).filter(
+		Bookmark.user_id == current_user.id,
+		Bookmark.idea_id == idea_id
+	).first()
+
+	if existing_bookmark:
+		raise HTTPException(
+			status_code=status.HTTP_400_BAD_REQUEST,
+			detail="Already bookmarked"
+		)
+
+	new_bookmark = Bookmark(
+		user_id=current_user.id,
+		idea_id=idea_id
+	)
+
+	db.add(new_bookmark)
+	db.commit()
+	db.refresh(new_bookmark)
+
+	return new_bookmark
+
+
+@router.get(
+	"/bookmarks",
+	response_model=list[IdeaResponse]
+)
+def get_bookmarks(
+	current_user: User = Depends(get_current_user),
+	db: Session = Depends(get_db),
+):
+	bookmarks = (
+		db.query(Idea)
+		.join(Bookmark)
+		.filter(
+			Bookmark.user_id == current_user.id
+		)
+		.all()
+	)
+
+	return bookmarks

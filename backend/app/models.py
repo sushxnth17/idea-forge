@@ -21,6 +21,8 @@ class User(Base):
 	ideas = relationship("Idea", back_populates="owner", cascade="all, delete-orphan")
 	likes = relationship("Like", back_populates="user", cascade="all, delete-orphan")
 	comments = relationship("Comment",back_populates="user",cascade="all, delete-orphan")
+	bookmarks = relationship("Bookmark",back_populates="user",cascade="all, delete-orphan")
+
 
 class Idea(Base):
 	__tablename__ = "ideas"
@@ -37,7 +39,8 @@ class Idea(Base):
 	tags = relationship("Tag", secondary=idea_tags, back_populates="ideas")
 	likes = relationship("Like", back_populates="idea", cascade="all, delete-orphan")
 	comments = relationship("Comment",back_populates="idea",cascade="all, delete-orphan")
-	
+	bookmarks = relationship("Bookmark",back_populates="idea",cascade="all, delete-orphan")
+
 	@property
 	def likes_count(self):
 		return len(self.likes)
@@ -114,4 +117,31 @@ class Comment(Base):
 	idea = relationship(
 		"Idea",
 		back_populates="comments"
+	)
+
+class Bookmark(Base):
+	__tablename__ = "bookmarks"
+
+	id = Column(Integer, primary_key=True, index=True)
+
+	user_id = Column(
+		Integer,
+		ForeignKey("users.id"),
+		nullable=False
+	)
+
+	idea_id = Column(
+		Integer,
+		ForeignKey("ideas.id"),
+		nullable=False
+	)
+
+	user = relationship(
+		"User",
+		back_populates="bookmarks"
+	)
+
+	idea = relationship(
+		"Idea",
+		back_populates="bookmarks"
 	)

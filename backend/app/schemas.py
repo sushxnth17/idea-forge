@@ -66,3 +66,10 @@ class UserLogin(BaseModel):
 class Token(BaseModel):
 	access_token: str
 	token_type: str
+
+class BookmarkResponse(BaseModel):
+	id: int
+	user_id: int
+	idea_id: int
+
+	model_config = ConfigDict(from_attributes=True)
