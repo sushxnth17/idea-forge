@@ -236,3 +236,41 @@ def create_comment(
 	db.refresh(new_comment)
 
 	return new_comment
+
+@router.post(
+	"/ideas/{idea_id}/remix",
+	response_model=IdeaResponse,
+	status_code=status.HTTP_201_CREATED
+)
+def remix_idea(
+	idea_id: int,
+	current_user: User = Depends(get_current_user),
+	db: Session = Depends(get_db),
+):
+	original_idea = (
+		db.query(Idea)
+		.filter(Idea.id == idea_id)
+		.first()
+	)
+
+	if original_idea is None:
+		raise HTTPException(
+			status_code=status.HTTP_404_NOT_FOUND,
+			detail="Idea not found"
+		)
+
+	new_idea = Idea(
+		title=f"{original_idea.title} (Remix)",
+		description=original_idea.description,
+		is_public=False,
+		owner_id=current_user.id,
+		parent_idea_id=original_idea.id
+	)
+
+	new_idea.tags = original_idea.tags.copy()
+
+	db.add(new_idea)
+	db.commit()
+	db.refresh(new_idea)
+
+	return new_idea

@@ -52,6 +52,7 @@ class IdeaResponse(BaseModel):
 	tags: list[TagResponse]
 	likes_count: int = 0
 	comments: list[CommentResponse] = []
+	parent_idea_id: int | None = None
 	created_at: datetime
 	owner_id: int
 

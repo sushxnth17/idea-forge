@@ -31,11 +31,13 @@ class Idea(Base):
 	is_public = Column(Boolean, default=False, nullable=False)
 	created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 	owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+	parent_idea_id = Column(Integer,ForeignKey("ideas.id"),nullable=True)
 	owner = relationship("User", back_populates="ideas")
+	parent_idea = relationship("Idea",remote_side=[id])
 	tags = relationship("Tag", secondary=idea_tags, back_populates="ideas")
 	likes = relationship("Like", back_populates="idea", cascade="all, delete-orphan")
 	comments = relationship("Comment",back_populates="idea",cascade="all, delete-orphan")
-
+	
 	@property
 	def likes_count(self):
 		return len(self.likes)
