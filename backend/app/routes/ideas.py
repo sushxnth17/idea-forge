@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from ..auth import get_current_user
 from ..database import get_db
-from ..models import Idea, User, Tag, Like, Comment,Bookmark
+from ..models import (Idea, User, Tag, Like, Comment,Bookmark,Notification)
 from ..schemas import (IdeaCreate,IdeaResponse,CommentCreate,CommentResponse, BookmarkResponse)
 
 
@@ -195,11 +195,20 @@ def like_idea(
 		)
 
 	new_like = Like(
-		user_id=current_user.id,
-		idea_id=idea_id
-	)
+	user_id=current_user.id,
+	idea_id=idea_id
+)
 
 	db.add(new_like)
+
+	# Don't notify yourself
+	if current_user.id != idea.owner_id:
+		notification = Notification(
+			message=f"{current_user.username} liked your idea '{idea.title}'",
+			user_id=idea.owner_id
+		)
+
+		db.add(notification)
 	db.commit()
 
 	return {"message": "Idea liked successfully"}
@@ -232,6 +241,12 @@ def create_comment(
 	)
 
 	db.add(new_comment)
+	if current_user.id != idea.owner_id:
+		notification = Notification(
+			message=f"{current_user.username} commented on your idea '{idea.title}'",
+			user_id=idea.owner_id
+		)
+		db.add(notification)
 	db.commit()
 	db.refresh(new_comment)
 
@@ -270,6 +285,14 @@ def remix_idea(
 	new_idea.tags = original_idea.tags.copy()
 
 	db.add(new_idea)
+
+	if current_user.id != original_idea.owner_id:
+		notification = Notification(
+		message=f"{current_user.username} remixed your idea '{original_idea.title}'",
+		user_id=original_idea.owner_id
+	)
+
+		db.add(notification)
 	db.commit()
 	db.refresh(new_idea)
 

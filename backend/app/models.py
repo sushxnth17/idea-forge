@@ -24,6 +24,7 @@ class User(Base):
 	likes = relationship("Like", back_populates="user", cascade="all, delete-orphan")
 	comments = relationship("Comment",back_populates="user",cascade="all, delete-orphan")
 	bookmarks = relationship("Bookmark",back_populates="user",cascade="all, delete-orphan")
+	notifications = relationship("Notification",back_populates="user",cascade="all, delete-orphan")
 
 
 class Idea(Base):
@@ -146,4 +147,41 @@ class Bookmark(Base):
 	idea = relationship(
 		"Idea",
 		back_populates="bookmarks"
+	)
+
+class Notification(Base):
+	__tablename__ = "notifications"
+
+	id = Column(
+		Integer,
+		primary_key=True,
+		index=True
+	)
+
+	message = Column(
+		Text,
+		nullable=False
+	)
+
+	is_read = Column(
+		Boolean,
+		default=False,
+		nullable=False
+	)
+
+	created_at = Column(
+		DateTime(timezone=True),
+		server_default=func.now(),
+		nullable=False
+	)
+
+	user_id = Column(
+		Integer,
+		ForeignKey("users.id"),
+		nullable=False
+	)
+
+	user = relationship(
+		"User",
+		back_populates="notifications"
 	)

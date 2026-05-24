@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from ..database import get_db
-from ..models import User
-from ..schemas import (UserCreate,UserResponse,UserLogin,Token,UserProfileUpdate)
+from ..models import User, Notification
+from ..schemas import (UserCreate,UserResponse,UserLogin,Token,UserProfileUpdate,NotificationResponse)
 from ..utils import hash_password, verify_password
 from ..auth import create_access_token, get_current_user
 
@@ -95,3 +95,56 @@ def update_profile(
 	db.refresh(current_user)
 
 	return current_user
+
+@router.get(
+	"/notifications",
+	response_model=list[NotificationResponse]
+)
+def get_notifications(
+	current_user: User = Depends(get_current_user),
+	db: Session = Depends(get_db),
+):
+	notifications = (
+		db.query(Notification)
+		.filter(
+			Notification.user_id == current_user.id
+		)
+		.order_by(
+			Notification.created_at.desc()
+		)
+		.all()
+	)
+
+	return notifications
+
+
+@router.put(
+	"/notifications/{notification_id}/read"
+)
+def mark_notification_read(
+	notification_id: int,
+	current_user: User = Depends(get_current_user),
+	db: Session = Depends(get_db),
+):
+	notification = (
+		db.query(Notification)
+		.filter(
+			Notification.id == notification_id,
+			Notification.user_id == current_user.id
+		)
+		.first()
+	)
+
+	if not notification:
+		raise HTTPException(
+			status_code=status.HTTP_404_NOT_FOUND,
+			detail="Notification not found"
+		)
+
+	notification.is_read = True
+
+	db.commit()
+
+	return {
+		"message": "Notification marked as read"
+	}
