@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 
 from ..auth import get_current_user
 from ..database import get_db
-from ..models import Idea, User, Tag, Like
-from ..schemas import IdeaCreate, IdeaResponse
+from ..models import Idea, User, Tag, Like, Comment
+from ..schemas import (IdeaCreate,IdeaResponse,CommentCreate,CommentResponse,)
 
 
 router = APIRouter()
@@ -203,3 +203,36 @@ def like_idea(
 	db.commit()
 
 	return {"message": "Idea liked successfully"}
+
+@router.post(
+	"/ideas/{idea_id}/comments",
+	response_model=CommentResponse,
+	status_code=status.HTTP_201_CREATED
+)
+def create_comment(
+	idea_id: int,
+	comment: CommentCreate,
+	current_user: User = Depends(get_current_user),
+	db: Session = Depends(get_db),
+):
+	idea = db.query(Idea).filter(
+		Idea.id == idea_id
+	).first()
+
+	if not idea:
+		raise HTTPException(
+			status_code=status.HTTP_404_NOT_FOUND,
+			detail="Idea not found"
+		)
+
+	new_comment = Comment(
+		content=comment.content,
+		user_id=current_user.id,
+		idea_id=idea_id
+	)
+
+	db.add(new_comment)
+	db.commit()
+	db.refresh(new_comment)
+
+	return new_comment

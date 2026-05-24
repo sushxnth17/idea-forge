@@ -20,7 +20,7 @@ class User(Base):
 	created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 	ideas = relationship("Idea", back_populates="owner", cascade="all, delete-orphan")
 	likes = relationship("Like", back_populates="user", cascade="all, delete-orphan")
-
+	comments = relationship("Comment",back_populates="user",cascade="all, delete-orphan")
 
 class Idea(Base):
 	__tablename__ = "ideas"
@@ -34,6 +34,7 @@ class Idea(Base):
 	owner = relationship("User", back_populates="ideas")
 	tags = relationship("Tag", secondary=idea_tags, back_populates="ideas")
 	likes = relationship("Like", back_populates="idea", cascade="all, delete-orphan")
+	comments = relationship("Comment",back_populates="idea",cascade="all, delete-orphan")
 
 	@property
 	def likes_count(self):
@@ -76,4 +77,39 @@ class Like(Base):
 	idea = relationship(
 		"Idea",
 		back_populates="likes"
+	)
+
+class Comment(Base):
+	__tablename__ = "comments"
+
+	id = Column(Integer, primary_key=True, index=True)
+
+	content = Column(Text, nullable=False)
+
+	created_at = Column(
+		DateTime(timezone=True),
+		server_default=func.now(),
+		nullable=False
+	)
+
+	user_id = Column(
+		Integer,
+		ForeignKey("users.id"),
+		nullable=False
+	)
+
+	idea_id = Column(
+		Integer,
+		ForeignKey("ideas.id"),
+		nullable=False
+	)
+
+	user = relationship(
+		"User",
+		back_populates="comments"
+	)
+
+	idea = relationship(
+		"Idea",
+		back_populates="comments"
 	)

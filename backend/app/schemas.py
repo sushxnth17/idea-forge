@@ -22,7 +22,21 @@ class TagResponse(BaseModel):
 	name: str
 
 	model_config = ConfigDict(from_attributes=True)
-	
+
+class CommentCreate(BaseModel):
+	content: str
+
+
+class CommentResponse(BaseModel):
+	id: int
+	content: str
+	created_at: datetime
+	user_id: int
+	idea_id: int
+
+	model_config = ConfigDict(from_attributes=True)
+
+
 class IdeaCreate(BaseModel):
 	title: str
 	description: str
@@ -37,6 +51,7 @@ class IdeaResponse(BaseModel):
 	is_public: bool
 	tags: list[TagResponse]
 	likes_count: int = 0
+	comments: list[CommentResponse] = []
 	created_at: datetime
 	owner_id: int
 
