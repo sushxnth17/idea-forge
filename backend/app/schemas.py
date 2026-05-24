@@ -13,9 +13,17 @@ class UserResponse(BaseModel):
 	id: int
 	username: str
 	email: str
+	bio: str | None = None
+	profile_picture: str | None = None
 	created_at: datetime
 
 	model_config = ConfigDict(from_attributes=True)
+
+
+class UserProfileUpdate(BaseModel):
+	bio: str | None = None
+	profile_picture: str | None = None
+
 
 class TagResponse(BaseModel):
 	id: int

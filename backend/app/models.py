@@ -17,6 +17,8 @@ class User(Base):
 	username = Column(String, unique=True, index=True, nullable=False)
 	email = Column(String, unique=True, index=True, nullable=False)
 	hashed_password = Column(String, nullable=False)
+	bio = Column(Text, nullable=True)
+	profile_picture = Column(String,nullable=True)
 	created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 	ideas = relationship("Idea", back_populates="owner", cascade="all, delete-orphan")
 	likes = relationship("Like", back_populates="user", cascade="all, delete-orphan")

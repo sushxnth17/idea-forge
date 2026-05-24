@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from ..database import get_db
 from ..models import User
-from ..schemas import UserCreate, UserResponse, Token
+from ..schemas import (UserCreate,UserResponse,UserLogin,Token,UserProfileUpdate)
 from ..utils import hash_password, verify_password
 from ..auth import create_access_token, get_current_user
 
@@ -73,4 +73,25 @@ def login_user(
 
 @router.get("/me", response_model=UserResponse)
 def get_me(current_user: User = Depends(get_current_user)):
+	return current_user
+
+@router.get("/profile", response_model=UserResponse)
+def get_profile(
+	current_user: User = Depends(get_current_user),
+):
+	return current_user
+
+
+@router.put("/profile", response_model=UserResponse)
+def update_profile(
+	profile_data: UserProfileUpdate,
+	current_user: User = Depends(get_current_user),
+	db: Session = Depends(get_db),
+):
+	current_user.bio = profile_data.bio
+	current_user.profile_picture = profile_data.profile_picture
+
+	db.commit()
+	db.refresh(current_user)
+
 	return current_user
