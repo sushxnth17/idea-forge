@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from ..auth import get_current_user
 from ..database import get_db
-from ..models import (Idea, User, Tag, Like, Comment,Bookmark,Notification)
+from ..models import (Idea, User, Tag, Like, Comment,Bookmark,Notification,Follow)
 from ..schemas import (IdeaCreate,IdeaResponse,CommentCreate,CommentResponse, BookmarkResponse)
 
 
@@ -365,3 +365,31 @@ def get_bookmarks(
 	)
 
 	return bookmarks
+
+
+@router.get(
+	"/following-feed",
+	response_model=list[IdeaResponse]
+)
+def get_following_feed(
+	current_user: User = Depends(get_current_user),
+	db: Session = Depends(get_db),
+):
+	followed_users = (
+		db.query(Follow.following_id)
+		.filter(
+			Follow.follower_id == current_user.id
+		)
+	)
+
+	ideas = (
+		db.query(Idea)
+		.filter(
+			Idea.owner_id.in_(followed_users),
+			Idea.is_public == True
+		)
+		.order_by(Idea.created_at.desc())
+		.all()
+	)
+
+	return ideas

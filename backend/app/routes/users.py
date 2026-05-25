@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from ..database import get_db
-from ..models import User, Notification
-from ..schemas import (UserCreate,UserResponse,UserLogin,Token,UserProfileUpdate,NotificationResponse)
+from ..models import User, Notification, Follow
+from ..schemas import (UserCreate,UserResponse,UserLogin,Token,UserProfileUpdate,NotificationResponse,FollowResponse)
 from ..utils import hash_password, verify_password
 from ..auth import create_access_token, get_current_user
 
@@ -148,3 +148,75 @@ def mark_notification_read(
 	return {
 		"message": "Notification marked as read"
 	}
+
+@router.post(
+	"/follow/{user_id}",
+	response_model=FollowResponse,
+	status_code=status.HTTP_201_CREATED
+)
+def follow_user(
+	user_id: int,
+	current_user: User = Depends(get_current_user),
+	db: Session = Depends(get_db),
+):
+	if current_user.id == user_id:
+		raise HTTPException(
+			status_code=400,
+			detail="You cannot follow yourself"
+		)
+
+	user = db.query(User).filter(
+		User.id == user_id
+	).first()
+
+	if not user:
+		raise HTTPException(
+			status_code=404,
+			detail="User not found"
+		)
+
+	existing_follow = db.query(Follow).filter(
+		Follow.follower_id == current_user.id,
+		Follow.following_id == user_id
+	).first()
+
+	if existing_follow:
+		raise HTTPException(
+			status_code=400,
+			detail="Already following"
+		)
+
+	new_follow = Follow(
+		follower_id=current_user.id,
+		following_id=user_id
+	)
+
+	db.add(new_follow)
+	db.commit()
+	db.refresh(new_follow)
+
+	return new_follow
+
+
+@router.get("/followers/{user_id}")
+def get_followers(
+	user_id: int,
+	db: Session = Depends(get_db),
+):
+	return (
+		db.query(Follow)
+		.filter(Follow.following_id == user_id)
+		.all()
+	)
+
+
+@router.get("/following/{user_id}")
+def get_following(
+	user_id: int,
+	db: Session = Depends(get_db),
+):
+	return (
+		db.query(Follow)
+		.filter(Follow.follower_id == user_id)
+		.all()
+	)

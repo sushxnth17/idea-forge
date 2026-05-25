@@ -89,3 +89,10 @@ class NotificationResponse(BaseModel):
 	created_at: datetime
 
 	model_config = ConfigDict(from_attributes=True)
+
+class FollowResponse(BaseModel):
+	id: int
+	follower_id: int
+	following_id: int
+
+	model_config = ConfigDict(from_attributes=True)

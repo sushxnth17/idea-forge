@@ -25,6 +25,8 @@ class User(Base):
 	comments = relationship("Comment",back_populates="user",cascade="all, delete-orphan")
 	bookmarks = relationship("Bookmark",back_populates="user",cascade="all, delete-orphan")
 	notifications = relationship("Notification",back_populates="user",cascade="all, delete-orphan")
+	followers = relationship("Follow",foreign_keys="Follow.following_id",cascade="all, delete-orphan")
+	following = relationship("Follow",foreign_keys="Follow.follower_id",cascade="all, delete-orphan")
 
 
 class Idea(Base):
@@ -184,4 +186,35 @@ class Notification(Base):
 	user = relationship(
 		"User",
 		back_populates="notifications"
+	)
+
+class Follow(Base):
+	__tablename__ = "follows"
+
+	id = Column(
+		Integer,
+		primary_key=True,
+		index=True
+	)
+
+	follower_id = Column(
+		Integer,
+		ForeignKey("users.id"),
+		nullable=False
+	)
+
+	following_id = Column(
+		Integer,
+		ForeignKey("users.id"),
+		nullable=False
+	)
+
+	follower = relationship(
+		"User",
+		foreign_keys=[follower_id]
+	)
+
+	following = relationship(
+		"User",
+		foreign_keys=[following_id]
 	)
