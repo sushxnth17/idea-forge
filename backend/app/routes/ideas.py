@@ -138,12 +138,18 @@ def delete_idea(
 
 @router.get("/feed", response_model=list[IdeaResponse])
 def get_public_feed(
+	page: int = 1,
+	limit: int = 5,
 	db: Session = Depends(get_db),
 ):
+	skip = (page - 1) * limit
+
 	public_ideas = (
 		db.query(Idea)
 		.filter(Idea.is_public == True)
 		.order_by(Idea.created_at.desc())
+		.offset(skip)
+		.limit(limit)
 		.all()
 	)
 
@@ -195,8 +201,8 @@ def like_idea(
 		)
 
 	new_like = Like(
-	user_id=current_user.id,
-	idea_id=idea_id
+		user_id=current_user.id,
+		idea_id=idea_id
 )
 
 	db.add(new_like)
