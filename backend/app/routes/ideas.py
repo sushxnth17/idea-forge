@@ -393,3 +393,27 @@ def get_following_feed(
 	)
 
 	return ideas
+
+@router.get(
+	"/trending",
+	response_model=list[IdeaResponse]
+)
+def get_trending_ideas(
+	db: Session = Depends(get_db),
+):
+	ideas = (
+		db.query(Idea)
+		.filter(Idea.is_public == True)
+		.all()
+	)
+
+	sorted_ideas = sorted(
+		ideas,
+		key=lambda idea:
+			(len(idea.likes) * 2)
+			+
+			len(idea.comments),
+		reverse=True
+	)
+
+	return sorted_ideas[:10]
