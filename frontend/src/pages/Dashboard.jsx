@@ -15,6 +15,9 @@ function Dashboard() {
             <br/><br/>
 
             <Link to="/trending">Trending</Link>
+            <br/><br/>
+
+            <Link to="/create">Create Idea</Link>
         </div>
     );
 }
