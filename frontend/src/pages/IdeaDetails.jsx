@@ -17,7 +17,7 @@ function IdeaDetails() {
         try {
 
             const response = await api.get(
-                `/ideas/${id}`
+                `/public/ideas/${id}`
             );
 
             setIdea(response.data);
@@ -26,6 +26,20 @@ function IdeaDetails() {
             console.log(error);
         }
     }
+    async function handleLike() {
+
+    try {
+
+        await api.post(
+            `/ideas/${id}/like`
+        );
+
+        fetchIdea();
+
+    } catch(error) {
+        console.log(error);
+    }
+}
 
     if (!idea) {
         return <h2>Loading...</h2>;
@@ -38,8 +52,12 @@ function IdeaDetails() {
 
             <p>{idea.description}</p>
 
+           <button onClick={handleLike}>
+                ❤️ Like
+            </button>
+
             <p>
-                ❤️ {idea.likes_count}
+                     Likes: {idea.likes_count}
             </p>
 
             <h3>Tags</h3>

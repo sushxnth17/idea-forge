@@ -417,3 +417,31 @@ def get_trending_ideas(
 	)
 
 	return sorted_ideas[:10]
+
+@router.get(
+    "/public/ideas/{idea_id}",
+    response_model=IdeaResponse
+)
+def get_public_idea(
+    idea_id: int,
+    db: Session = Depends(get_db),
+):
+
+    idea = (
+        db.query(Idea)
+        .filter(
+            Idea.id == idea_id,
+            Idea.is_public == True
+        )
+        .first()
+    )
+
+    if idea is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Idea not found"
+        )
+	
+    db.refresh(idea)
+
+    return idea
