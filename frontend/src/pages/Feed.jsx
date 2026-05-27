@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
+import { Link } from "react-router-dom";
 
 function Feed() {
     const [ideas, setIdeas] = useState([]);
@@ -21,27 +22,37 @@ function Feed() {
         <div>
             <h1>Public Feed 🚀</h1>
 
-            {ideas.map((idea) => (
-                <div
-                    key={idea.id}
-                    style={{
-                        border:"1px solid gray",
-                        margin:"10px",
-                        padding:"10px"
-                    }}
-                >
-                    <h2>{idea.title}</h2>
+           {ideas.map((idea) => (
+    <Link
+        key={idea.id}
+        to={`/ideas/${idea.id}`}
+        style={{
+            textDecoration:"none",
+            color:"white"
+        }}
+    >
 
-                    <p>
-                        {idea.description}
-                    </p>
+        <div
+            style={{
+                border:"1px solid gray",
+                margin:"10px",
+                padding:"10px"
+            }}
+        >
+            <h2>{idea.title}</h2>
 
-                    <p>
-                        ❤️ {idea.likes_count}
-                    </p>
+            <p>
+                {idea.description}
+            </p>
 
-                </div>
-            ))}
+            <p>
+                ❤️ {idea.likes_count}
+            </p>
+
+        </div>
+
+    </Link>
+))}
         </div>
     );
 }

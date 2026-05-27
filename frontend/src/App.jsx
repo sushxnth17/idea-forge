@@ -8,6 +8,7 @@ import Profile from "./pages/Profile";
 import Notifications from "./pages/Notifications";
 import Trending from "./pages/Trending";
 import CreateIdea from "./pages/CreateIdea";
+import IdeaDetails from "./pages/IdeaDetails";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -77,6 +78,15 @@ function App() {
           element={
             <ProtectedRoute>
               <CreateIdea />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/ideas/:id"
+          element={
+            <ProtectedRoute>
+              <IdeaDetails />
             </ProtectedRoute>
           }
         />
