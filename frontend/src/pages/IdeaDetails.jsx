@@ -7,6 +7,7 @@ function IdeaDetails() {
     const { id } = useParams();
 
     const [idea, setIdea] = useState(null);
+    const [comment, setComment] = useState("");
 
     useEffect(() => {
         fetchIdea();
@@ -33,6 +34,28 @@ function IdeaDetails() {
         await api.post(
             `/ideas/${id}/like`
         );
+
+        fetchIdea();
+
+    } catch(error) {
+        console.log(error);
+    }
+}
+
+    async function handleComment(e) {
+
+    e.preventDefault();
+
+    try {
+
+        await api.post(
+            `/ideas/${id}/comments`,
+            {
+                content: comment
+            }
+        );
+
+        setComment("");
 
         fetchIdea();
 
@@ -74,6 +97,24 @@ function IdeaDetails() {
             ))}
 
             <h3>Comments</h3>
+            <form onSubmit={handleComment}>
+
+                 <input
+                    type="text"
+                    placeholder="Write a comment..."
+                    value={comment}
+                    onChange={(e)=>
+                        setComment(e.target.value)
+                    }
+                />
+
+                <button type="submit">
+                    Add Comment
+                </button>
+
+            </form>
+
+            <br/>
 
             {idea.comments.map((comment)=>(
                 <div
