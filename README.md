@@ -1,4 +1,4 @@
-🚀 IdeaForge
+### 🚀 IdeaForge
 
 IdeaForge is a collaborative innovation platform where users can share ideas, improve existing concepts, and work together to transform simple thoughts into impactful solutions, projects, or startup opportunities.
 
@@ -6,16 +6,16 @@ The platform encourages community-driven creativity by allowing people to build 
 
 ---
 
-✨ Features
+### ✨ Features
 
-🔐 Authentication
+## 🔐 Authentication
 
 - User Registration
 - Secure Login with JWT Authentication
 - Protected Routes
 - Logout Functionality
 
-💡 Ideas
+## 💡 Ideas
 
 - Create New Ideas
 - Public Idea Feed
@@ -23,7 +23,7 @@ The platform encourages community-driven creativity by allowing people to build 
 - Idea Remixing System
 - Trending Ideas
 
-❤️ Social Interactions
+## ❤️ Social Interactions
 
 - Like Ideas
 - Comment on Ideas
@@ -31,7 +31,7 @@ The platform encourages community-driven creativity by allowing people to build 
 - Notifications System
 - Follow Users
 
-👤 User Features
+## 👤 User Features
 
 - User Profiles
 - Profile Updates
@@ -39,7 +39,7 @@ The platform encourages community-driven creativity by allowing people to build 
 
 ---
 
-🛠️ Tech Stack
+## 🛠️ Tech Stack
 
 Frontend
 
@@ -59,7 +59,7 @@ Backend
 
 ---
 
-📁 Project Structure
+## 📁 Project Structure
 
 ideaForge/
 │
@@ -141,7 +141,7 @@ http://localhost:5173
 
 ---
 
-🔗 API Integration
+### 🔗 API Integration
 
 Frontend communicates with FastAPI backend using Axios.
 
@@ -149,7 +149,7 @@ Authentication is handled using JWT tokens stored in local storage.
 
 ---
 
-🗄️ Database
+### 🗄️ Database
 
 - PostgreSQL
 - SQLAlchemy ORM
@@ -168,7 +168,7 @@ Main tables:
 
 ---
 
-📸 Current Functionalities
+### 📸 Current Functionalities
 
 ✅ Authentication System
 ✅ Public Feed
@@ -183,7 +183,7 @@ Main tables:
 
 ---
 
-🚀 Future Enhancements
+### 🚀 Future Enhancements
 
 - AI-Powered Idea Summaries
 - Semantic Idea Search
@@ -197,13 +197,13 @@ Main tables:
 
 ---
 
-🧠 Inspiration
+### 🧠 Inspiration
 
 IdeaForge was built to encourage collaborative innovation and help people turn raw ideas into meaningful creations through community participation.
 
 ---
 
-📜 License
+### 📜 License
 
 This project is developed for learning, innovation, and collaborative development purposes.
 ## Windows
