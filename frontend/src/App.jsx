@@ -9,7 +9,7 @@ import Notifications from "./pages/Notifications";
 import Trending from "./pages/Trending";
 import CreateIdea from "./pages/CreateIdea";
 import IdeaDetails from "./pages/IdeaDetails";
-
+import Search from "./pages/Search";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
@@ -87,6 +87,15 @@ function App() {
           element={
             <ProtectedRoute>
               <IdeaDetails />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/search"
+          element={
+            <ProtectedRoute>
+              <Search />
             </ProtectedRoute>
           }
         />

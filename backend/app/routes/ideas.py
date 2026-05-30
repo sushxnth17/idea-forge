@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-
+from sqlalchemy import or_
 from ..auth import get_current_user
 from ..database import get_db
 from ..models import (Idea, User, Tag, Like, Comment,Bookmark,Notification,Follow)
@@ -445,3 +445,23 @@ def get_public_idea(
     db.refresh(idea)
 
     return idea
+
+@router.get("/search", response_model=list[IdeaResponse])
+def search_ideas(
+    query: str,
+    db: Session = Depends(get_db)
+):
+
+    ideas = (
+        db.query(Idea)
+        .filter(
+            Idea.is_public == True,
+            or_(
+                Idea.title.ilike(f"%{query}%"),
+                Idea.description.ilike(f"%{query}%")
+            )
+        )
+        .all()
+    )
+
+    return ideas

@@ -41,6 +41,12 @@ function Dashboard() {
 
             <br/><br/>
 
+            <Link to="/search">
+                Search Ideas
+            </Link>
+
+            <br/><br/>
+
             <button onClick={handleLogout}>
                 Logout
             </button>
