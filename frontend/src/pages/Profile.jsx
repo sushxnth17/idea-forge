@@ -1,46 +1,80 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
+import AppLayout from "../components/AppLayout";
 
 function Profile() {
     const [profile, setProfile] = useState(null);
 
     useEffect(() => {
-        fetchProfile();
+        let isActive = true;
+
+        async function loadProfile() {
+            try {
+                const response = await api.get("/users/profile");
+
+                if (isActive) {
+                    setProfile(response.data);
+                }
+            } catch(error) {
+                console.log(error);
+            }
+        }
+
+        loadProfile();
+
+        return () => {
+            isActive = false;
+        };
     }, []);
 
-    async function fetchProfile() {
-        try {
-            const response = await api.get("/users/profile");
-            setProfile(response.data);
-
-        } catch(error) {
-            console.log(error);
-        }
-    }
-
     if (!profile) {
-        return <h2>Loading...</h2>;
+        return (
+            <AppLayout>
+                <div className="loading-state">
+                    <h2>Loading profile...</h2>
+                    <p className="muted">Fetching the current account details.</p>
+                </div>
+            </AppLayout>
+        );
     }
 
     return (
-        <div>
-            <h1>My Profile 👤</h1>
+        <AppLayout>
+            <section className="page__header">
+                <p className="page__eyebrow">Account</p>
+                <h1>My Profile</h1>
+                <p className="page__lead muted">Review your identity and public information.</p>
+            </section>
 
-            <p>
-                <strong>Username:</strong>{" "}
-                {profile.username}
-            </p>
+            <div className="profile-layout">
+                <div className="profile-card card">
+                    <div className="profile-row profile-row--header">
+                        <div className="profile-avatar">{profile.username?.[0]?.toUpperCase()}</div>
+                        <div>
+                            <h3>{profile.username}</h3>
+                            <p className="muted">IdeaForge creator</p>
+                        </div>
+                    </div>
 
-            <p>
-                <strong>Email:</strong>{" "}
-                {profile.email}
-            </p>
+                    <div className="profile-section">
+                        <div className="profile-row">
+                            <span className="muted">Username</span>
+                            <strong>{profile.username}</strong>
+                        </div>
 
-            <p>
-                <strong>Bio:</strong>{" "}
-                {profile.bio || "No bio"}
-            </p>
-        </div>
+                        <div className="profile-row">
+                            <span className="muted">Email</span>
+                            <strong>{profile.email}</strong>
+                        </div>
+
+                        <div className="profile-row">
+                            <span className="muted">Bio</span>
+                            <strong>{profile.bio || "No bio"}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </AppLayout>
     );
 }
 

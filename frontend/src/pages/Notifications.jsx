@@ -1,54 +1,57 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
+import AppLayout from "../components/AppLayout";
 
 function Notifications() {
     const [notifications, setNotifications] = useState([]);
 
     useEffect(() => {
-        fetchNotifications();
+        let isActive = true;
+
+        async function loadNotifications() {
+            try {
+                const response = await api.get("/users/notifications");
+
+                if (isActive) {
+                    setNotifications(response.data);
+                }
+            } catch(error) {
+                console.log(error);
+            }
+        }
+
+        loadNotifications();
+
+        return () => {
+            isActive = false;
+        };
     }, []);
 
-    async function fetchNotifications() {
-        try {
-            const response = await api.get(
-                "/users/notifications"
-            );
-
-            setNotifications(response.data);
-
-        } catch(error) {
-            console.log(error);
-        }
-    }
-
     return (
-        <div>
-            <h1>🔔 Notifications</h1>
+        <AppLayout>
+            <section className="page__header">
+                <p className="page__eyebrow">Inbox</p>
+                <h1>Notifications</h1>
+                <p className="page__lead muted">Track read and unread activity in one place.</p>
+            </section>
 
-            {notifications.map((notification)=>(
-                <div
-                    key={notification.id}
-                    style={{
-                        border:"1px solid gray",
-                        margin:"10px",
-                        padding:"10px"
-                    }}
-                >
-                    <p>
-                        {notification.message}
-                    </p>
+            <div className="notifications-list">
+                {notifications.map((notification) => (
+                    <div
+                        key={notification.id}
+                        className={`notification-card card ${notification.is_read ? "" : "notification-card--unread"}`.trim()}
+                    >
+                        <p className="notification-card__message">{notification.message}</p>
 
-                    <small>
-                        Read:
-                        {" "}
-                        {notification.is_read
-                            ? "✅"
-                            : "❌"}
-                    </small>
-
-                </div>
-            ))}
-        </div>
+                        <div className="notification-card__status">
+                            <span className={notification.is_read ? "badge badge--success" : "badge badge--warning"}>
+                                {notification.is_read ? "Read" : "Unread"}
+                            </span>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </AppLayout>
     );
 }
 
