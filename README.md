@@ -59,24 +59,6 @@ Backend
 
 ---
 
-## 📁 Project Structure
-
-ideaForge/
-│
-├── frontend/
-│   ├── src/
-│   ├── public/
-│   └── package.json
-│
-├── backend/
-│   ├── app/
-│   ├── requirements.txt
-│   └── main.py
-│
-└── README.md
-
----
-
 ⚙️ Backend Setup
 
 1️⃣ Move to Backend Folder
