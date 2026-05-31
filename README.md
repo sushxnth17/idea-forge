@@ -152,16 +152,16 @@ Main tables:
 
 ### 📸 Current Functionalities
 
-✅ Authentication System
-✅ Public Feed
-✅ Trending Ideas
-✅ Idea Details Page
-✅ Likes System
-✅ Comments System
-✅ Notifications
-✅ Create Idea
-✅ User Profiles
-✅ Protected Routes
+- ✅ Authentication System
+- ✅ Public Feed
+- ✅ Trending Ideas
+- ✅ Idea Details Page
+- ✅ Likes System
+- ✅ Comments System
+- ✅ Notifications
+- ✅ Create Idea
+- ✅ User Profiles
+- ✅ Protected Routes
 
 ---
 
