@@ -11,6 +11,7 @@ import CreateIdea from "./pages/CreateIdea";
 import IdeaDetails from "./pages/IdeaDetails";
 import Search from "./pages/Search";
 import ProtectedRoute from "./components/ProtectedRoute";
+import UserIdeas from "./pages/UserIdeas";
 
 function App() {
   return (
@@ -96,6 +97,15 @@ function App() {
           element={
             <ProtectedRoute>
               <Search />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/users/:userId/ideas"
+          element={
+            <ProtectedRoute>
+              <UserIdeas />
             </ProtectedRoute>
           }
         />
