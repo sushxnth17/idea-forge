@@ -59,24 +59,6 @@ Backend
 
 ---
 
-## 📁 Project Structure
-
-ideaForge/
-│
-├── frontend/
-│   ├── src/
-│   ├── public/
-│   └── package.json
-│
-├── backend/
-│   ├── app/
-│   ├── requirements.txt
-│   └── main.py
-│
-└── README.md
-
----
-
 ⚙️ Backend Setup
 
 1️⃣ Move to Backend Folder
@@ -170,16 +152,16 @@ Main tables:
 
 ### 📸 Current Functionalities
 
-✅ Authentication System
-✅ Public Feed
-✅ Trending Ideas
-✅ Idea Details Page
-✅ Likes System
-✅ Comments System
-✅ Notifications
-✅ Create Idea
-✅ User Profiles
-✅ Protected Routes
+- ✅ Authentication System
+- ✅ Public Feed
+- ✅ Trending Ideas
+- ✅ Idea Details Page
+- ✅ Likes System
+- ✅ Comments System
+- ✅ Notifications
+- ✅ Create Idea
+- ✅ User Profiles
+- ✅ Protected Routes
 
 ---
 
