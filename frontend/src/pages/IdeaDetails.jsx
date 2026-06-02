@@ -74,6 +74,20 @@ function IdeaDetails() {
         console.log(error);
     }
 }
+    async function handleRemix() {
+
+    try {
+
+        await api.post(
+            `/ideas/${id}/remix`
+        );
+
+        alert("Idea remixed successfully!");
+
+    } catch(error) {
+        console.log(error);
+    }
+}
 
     async function handleComment(e) {
 
@@ -126,7 +140,13 @@ function IdeaDetails() {
                         >
                             ❤️ Like idea
                         </button>
-
+                    <button
+                        type="button"
+                        onClick={handleRemix}
+                        className="button"
+                    >
+                        🔁 Remix
+                    </button>
                         <button
                             type="button"
                             onClick={handleBookmark}

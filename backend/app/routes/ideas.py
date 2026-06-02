@@ -283,7 +283,7 @@ def remix_idea(
 	new_idea = Idea(
 		title=f"{original_idea.title} (Remix)",
 		description=original_idea.description,
-		is_public=False,
+		is_public=True,
 		owner_id=current_user.id,
 		parent_idea_id=original_idea.id
 	)
