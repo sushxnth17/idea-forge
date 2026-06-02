@@ -12,6 +12,7 @@ import IdeaDetails from "./pages/IdeaDetails";
 import Search from "./pages/Search";
 import ProtectedRoute from "./components/ProtectedRoute";
 import UserIdeas from "./pages/UserIdeas";
+import Bookmarks from "./pages/Bookmarks";
 
 function App() {
   return (
@@ -106,6 +107,15 @@ function App() {
           element={
             <ProtectedRoute>
               <UserIdeas />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/bookmarks"
+          element={
+            <ProtectedRoute>
+              <Bookmarks />
             </ProtectedRoute>
           }
         />

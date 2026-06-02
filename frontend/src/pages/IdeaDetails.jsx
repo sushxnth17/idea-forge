@@ -60,6 +60,20 @@ function IdeaDetails() {
         console.log(error);
     }
 }
+    async function handleBookmark() {
+
+    try {
+
+        await api.post(
+            `/ideas/${id}/bookmark`
+        );
+
+        alert("Idea bookmarked!");
+
+    } catch(error) {
+        console.log(error);
+    }
+}
 
     async function handleComment(e) {
 
@@ -105,10 +119,25 @@ function IdeaDetails() {
 
                 <div className="details-hero__panel">
                     <div className="details-actions">
-                        <button type="button" onClick={handleLike} className="button button--primary">
+                        <button
+                            type="button"
+                            onClick={handleLike}
+                            className="button button--primary"
+                        >
                             ❤️ Like idea
                         </button>
-                        <span className="badge">Likes: {idea.likes_count}</span>
+
+                        <button
+                            type="button"
+                            onClick={handleBookmark}
+                            className="button"
+                        >
+                            ⭐ Bookmark
+                        </button>
+
+                        <span className="badge">
+                            Likes: {idea.likes_count}
+                        </span>
                     </div>
 
                     <div>
