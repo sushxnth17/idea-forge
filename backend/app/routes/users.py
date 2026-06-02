@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from ..database import get_db
-from ..models import User, Notification, Follow
-from ..schemas import (UserCreate,UserResponse,UserLogin,Token,UserProfileUpdate,NotificationResponse,FollowResponse)
+from ..models import User, Notification, Follow,Idea
+from ..schemas import (UserCreate,UserResponse,UserLogin,Token,UserProfileUpdate,NotificationResponse,FollowResponse,IdeaResponse)
 from ..utils import hash_password, verify_password
 from ..auth import create_access_token, get_current_user
 
@@ -220,3 +220,23 @@ def get_following(
 		.filter(Follow.follower_id == user_id)
 		.all()
 	)
+
+@router.get(
+    "/{user_id}/ideas",
+    response_model=list[IdeaResponse]
+)
+def get_user_ideas(
+    user_id: int,
+    db: Session = Depends(get_db)
+):
+
+    ideas = (
+        db.query(Idea)
+        .filter(
+            Idea.owner_id == user_id,
+            Idea.is_public == True
+        )
+        .all()
+    )
+
+    return ideas
