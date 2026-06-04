@@ -1,59 +1,169 @@
 import { Link } from "react-router-dom";
 import AppLayout from "../components/AppLayout";
 
+const quickActions = [
+  {
+    to: "/create",
+    title: "Create idea",
+    description: "Draft and publish a new idea from a focused workspace.",
+    icon: "✍️"
+  },
+  {
+    to: "/search",
+    title: "Search ideas",
+    description: "Find inspiration across the live idea catalog.",
+    icon: "🔎"
+  },
+  {
+    to: "/feed",
+    title: "Review feed",
+    description: "Scan the latest ideas and community activity.",
+    icon: "📰"
+  }
+];
+
+const featureOverview = [
+  {
+    to: "/trending",
+    title: "Trend radar",
+    description: "See what is gaining momentum across the platform.",
+    icon: "🔥"
+  },
+  {
+    to: "/bookmarks",
+    title: "Saved concepts",
+    description: "Return to ideas you want to revisit later.",
+    icon: "⭐"
+  },
+  {
+    to: "/notifications",
+    title: "Activity inbox",
+    description: "Track updates, responses, and important signals.",
+    icon: "🔔"
+  },
+  {
+    to: "/profile",
+    title: "Creator profile",
+    description: "Review your identity and public-facing details.",
+    icon: "👤"
+  }
+];
+
 function Dashboard() {
+  function handleLogout() {
+    localStorage.removeItem("token");
+    window.location.href = "/";
+  }
 
-    function handleLogout() {
-        localStorage.removeItem("token");
-        window.location.href = "/";
-    }
+  return (
+    <AppLayout>
+      <div className="dashboard-shell">
+        <section className="dashboard-hero">
+          <div className="dashboard-hero__content card">
+            <p className="page__eyebrow">Workspace</p>
+            <h1>Dashboard</h1>
+            <p className="page__lead muted">
+              A modern home for IdeaForge. Move between creation, discovery, and engagement from one clean workspace.
+            </p>
 
-    return (
-        <AppLayout>
-            <section className="dashboard-hero">
-                <div className="dashboard-hero__intro">
-                    <p className="page__eyebrow">Workspace</p>
-                    <h1>Dashboard</h1>
-                    <p className="page__lead muted">
-                        Jump into the areas you use most and keep building from one place.
-                    </p>
-
-                    <div className="stats-row">
-                        <span className="badge badge--success">Connected</span>
-                        <span className="badge">FastAPI backend</span>
-                    </div>
-                </div>
-
-                <div className="dashboard-hero__panel card">
-                    <h3>Quick actions</h3>
-                    <p className="muted">Use the navigation cards below to get to the common flows faster.</p>
-                    <button onClick={handleLogout} className="button button--secondary button--full">
-                        Logout
-                    </button>
-                </div>
-            </section>
-
-            <div className="dashboard-grid">
-                {[
-                    { to: "/feed", title: "Feed", description: "Browse the latest public ideas.", icon: "📰" },
-                    { to: "/search", title: "Search Ideas", description: "Find ideas by keyword.", icon: "🔎" },
-                    { to: "/trending", title: "Trending", description: "See what is gaining momentum.", icon: "🔥" },
-                    { to: "/create", title: "Create Idea", description: "Start a new idea submission.", icon: "✍️" },
-                    { to: "/profile", title: "Profile", description: "Review your account details.", icon: "👤" },
-                    { to: "/notifications", title: "Notifications", description: "Check activity and updates.", icon: "🔔" }
-                ].map((item) => (
-                    <Link key={item.to} to={item.to} className="dashboard-card card card--interactive">
-                        <div className="dashboard-card__icon">{item.icon}</div>
-                        <div className="dashboard-card__body">
-                            <h3>{item.title}</h3>
-                            <p className="muted">{item.description}</p>
-                        </div>
-                        <span className="dashboard-card__cta button button--primary">Open</span>
-                    </Link>
-                ))}
+            <div className="dashboard-hero__stats" aria-label="Dashboard status">
+              <span className="badge badge--success">Connected</span>
+              <span className="badge">FastAPI backend</span>
+              <span className="badge badge--muted">Live routes</span>
             </div>
-        </AppLayout>
-    );
+
+            <div className="dashboard-hero__actions">
+              <Link to="/create" className="button button--primary">
+                Start an idea
+              </Link>
+              <Link to="/feed" className="button button--secondary">
+                Open feed
+              </Link>
+            </div>
+          </div>
+
+          <aside className="dashboard-hero__panel card">
+            <div className="dashboard-hero__panel-copy">
+              <p className="dashboard-hero__panel-label">Today</p>
+              <h3>One place to build and review everything</h3>
+              <p className="muted">
+                Stay in flow with quick access to your core creation and discovery paths.
+              </p>
+            </div>
+
+            <div className="dashboard-hero__metrics">
+              <div className="dashboard-metric">
+                <span className="dashboard-metric__value">6</span>
+                <span className="dashboard-metric__label">Primary routes</span>
+              </div>
+              <div className="dashboard-metric">
+                <span className="dashboard-metric__value">3</span>
+                <span className="dashboard-metric__label">Quick actions</span>
+              </div>
+              <div className="dashboard-metric">
+                <span className="dashboard-metric__value">4</span>
+                <span className="dashboard-metric__label">Feature areas</span>
+              </div>
+            </div>
+
+            <button onClick={handleLogout} className="button button--secondary button--full">
+              Logout
+            </button>
+          </aside>
+        </section>
+
+        <section className="dashboard-section">
+          <div className="dashboard-section__header">
+            <div>
+              <p className="page__eyebrow">Quick actions</p>
+              <h2>Jump to the most common flows</h2>
+            </div>
+            <p className="dashboard-section__copy muted">
+              Use these cards to move directly into the tasks you touch most often.
+            </p>
+          </div>
+
+          <div className="dashboard-actions-grid">
+            {quickActions.map((item) => (
+              <Link key={item.to} to={item.to} className="dashboard-action-card card card--interactive">
+                <div className="dashboard-action-card__icon">{item.icon}</div>
+                <div className="dashboard-action-card__body">
+                  <h3>{item.title}</h3>
+                  <p className="muted">{item.description}</p>
+                </div>
+                <span className="dashboard-action-card__cta">Open</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="dashboard-section">
+          <div className="dashboard-section__header">
+            <div>
+              <p className="page__eyebrow">Feature overview</p>
+              <h2>Explore the product surface</h2>
+            </div>
+            <p className="dashboard-section__copy muted">
+              Each card points to an existing route so you can move through the app without changing context.
+            </p>
+          </div>
+
+          <div className="dashboard-features-grid">
+            {featureOverview.map((item) => (
+              <Link key={item.to} to={item.to} className="dashboard-feature-card card card--interactive">
+                <div className="dashboard-feature-card__icon">{item.icon}</div>
+                <div className="dashboard-feature-card__body">
+                  <h3>{item.title}</h3>
+                  <p className="muted">{item.description}</p>
+                </div>
+                <span className="dashboard-feature-card__link">View</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      </div>
+    </AppLayout>
+  );
 }
 
 export default Dashboard;
