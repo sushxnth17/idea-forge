@@ -12,17 +12,19 @@ const navigationItems = [
 
 function Navbar() {
     return (
-        <nav className="app-nav" aria-label="Primary">
+        <header className="app-nav">
             <div className="app-nav__inner">
                 <Link to="/dashboard" className="app-nav__brand" aria-label="IdeaForge home">
-                    <span className="app-nav__brand-mark">I</span>
+                    <span className="app-nav__brand-mark" aria-hidden="true">
+                        IF
+                    </span>
                     <span className="app-nav__brand-copy">
                         <span className="app-nav__brand-title">IdeaForge</span>
-                        <span className="app-nav__brand-subtitle">Build, share, iterate</span>
+                        <span className="app-nav__brand-subtitle">Startup workspace for building in public</span>
                     </span>
                 </Link>
 
-                <div className="app-nav__links">
+                <nav className="app-nav__links" aria-label="Primary">
                     {navigationItems.map((item) => (
                         <NavLink
                             key={item.to}
@@ -34,9 +36,16 @@ function Navbar() {
                             {item.label}
                         </NavLink>
                     ))}
+                </nav>
+
+                <div className="app-nav__status" aria-hidden="true">
+                    <span className="app-nav__status-pill">
+                        <span className="app-nav__status-dot" />
+                        Productive mode
+                    </span>
                 </div>
             </div>
-        </nav>
+        </header>
     );
 }
 

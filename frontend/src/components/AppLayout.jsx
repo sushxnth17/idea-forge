@@ -4,7 +4,9 @@ function AppLayout({ children, className = "" }) {
   return (
     <div className="app-shell">
       <Navbar />
-      <main className={`app-shell__main ${className}`.trim()}>{children}</main>
+      <main className={`app-shell__main ${className}`.trim()}>
+        <div className="app-shell__surface">{children}</div>
+      </main>
     </div>
   );
 }
