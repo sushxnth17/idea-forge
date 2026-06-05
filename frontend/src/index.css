@@ -918,6 +918,87 @@ a:focus-visible {
   }
 }
 
+/* Additional responsive refinements for smaller devices */
+@media (max-width: 480px) {
+  /* Navigation - compact and scrollable */
+  .app-nav__inner {
+    padding: 12px 12px;
+    gap: 10px;
+  }
+
+  .app-nav__brand-copy { display: none; }
+  .app-nav__brand-mark { width:40px; height:40px; }
+
+  .app-nav__links {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    gap: 6px;
+    padding: 6px;
+  }
+
+  .app-nav__links::-webkit-scrollbar { display: none; }
+
+  .app-nav__link {
+    padding: 8px 10px;
+    min-height: 36px;
+    font-size: 0.86rem;
+  }
+
+  /* Make status pill compact */
+  .app-nav__status-pill { padding: 8px 10px; min-height:36px; }
+
+  /* Page container spacing */
+  .app-shell__main, .page { padding-top: 16px; padding-bottom: 28px; }
+
+  /* Forms: stack and full-width CTAs */
+  .search-form { grid-template-columns: 1fr; align-items: stretch; }
+  .search-form__actions { width: 100%; }
+  .search-form__actions .button, .search-form__actions .btn { width: 100%; }
+
+  .form__field { gap: 6px; }
+  .form__label { font-size: 0.86rem; }
+  .input, .search-field, .textarea { padding: 12px; min-height:44px; }
+
+  /* Cards: reduce padding and ensure stacked content */
+  .card, .panel { padding: 14px; border-radius: 18px; }
+
+  .feed-card .card__body, .ranking-card .card__body {
+    display: block;
+  }
+
+  .feed-card__likes, .feed-card__tags { margin-top: 10px; display:flex; gap:8px; flex-wrap:wrap; }
+
+  /* Ranking cards stack and show rank inline */
+  .ranking-card { grid-template-columns: 1fr; }
+  .ranking-card__rank { grid-row: auto; margin-bottom:8px; display:inline-flex; }
+
+  /* Notifications: compact layout */
+  .notification-card { gap:8px; }
+  .notification-card__status { justify-self: start; }
+
+  /* Profile adjustments */
+  .profile-avatar { width:56px; height:56px; font-size:1.2rem; }
+
+  /* Make badges smaller where needed */
+  .badge, .tag-pill { padding:6px 10px; font-size:0.78rem; }
+
+  /* Ensure grid-based sections become single column */
+  .section-grid, .dashboard-grid, .profile-layout { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 360px) {
+  /* Extra small: tighten fonts and gaps for 320px viewports */
+  h1 { font-size: clamp(1.6rem, 6vw, 2.6rem); }
+  .page__lead { font-size: 0.96rem; }
+  .app-nav__link { padding: 8px 8px; font-size: 0.82rem; }
+
+  .card, .panel { padding: 12px; }
+  .button, .btn { padding: 10px 12px; min-height: 38px; }
+  .profile-avatar { width:48px; height:48px; }
+  .feed-card__title, .ranking-card__title { font-size: 0.98rem; }
+  .muted { font-size: 0.9rem; }
+}
+
 .app-nav {
   position: sticky;
   top: 0;
