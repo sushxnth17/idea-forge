@@ -128,61 +128,86 @@ function IdeaDetails() {
                 <div className="details-hero__copy">
                     <p className="page__eyebrow">Idea details</p>
                     <h1 className="details-title">{idea.title}</h1>
-                    <p className="details-description">{idea.description}</p>
-                </div>
 
-                <div className="details-hero__panel">
-                    <div className="details-actions">
-                        <button
-                            type="button"
-                            onClick={handleLike}
-                            className="button button--primary"
-                        >
-                            ❤️ Like idea
-                        </button>
-                    <button
-                        type="button"
-                        onClick={handleRemix}
-                        className="button"
-                    >
-                        🔁 Remix
-                    </button>
-                        <button
-                            type="button"
-                            onClick={handleBookmark}
-                            className="button"
-                        >
-                            ⭐ Bookmark
-                        </button>
-
-                        <span className="badge">
-                            Likes: {idea.likes_count}
-                        </span>
+                    <div className="details-stats">
+                        <div className="meta-row">
+                            <span className="badge">❤️ {idea.likes_count}</span>
+                            <span className="badge">💬 {idea.comments.length}</span>
+                            <span className="badge">🔁 {idea.remixes_count ?? 0}</span>
+                        </div>
+                        <p className="page__lead details-description">{idea.description}</p>
                     </div>
 
-                    <div>
-                        <h3>Tags</h3>
-                        <div className="details-tags">
-                            {idea.tags.map((tag) => (
-                                <span key={tag.id} className="tag-pill">
-                                    #{tag.name}
-                                </span>
-                            ))}
+                    <div className="details-tags" aria-label="Idea tags">
+                        {idea.tags.map((tag) => (
+                            <span key={tag.id} className="tag-pill" aria-hidden>
+                                #{tag.name}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+
+                <aside className="details-hero__panel">
+                    <div className="card panel">
+                        <div className="details-actions" role="group" aria-label="Idea actions">
+                            <button
+                                type="button"
+                                onClick={handleLike}
+                                className="button button--primary"
+                                title="Like"
+                            >
+                                ❤️ Like
+                            </button>
+
+                            <div className="button-group">
+                                <button type="button" onClick={handleRemix} className="button" title="Remix">
+                                    🔁 Remix
+                                </button>
+                                <button type="button" onClick={handleBookmark} className="button" title="Bookmark">
+                                    ⭐ Bookmark
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="card__meta" style={{marginTop:12}}>
+                            <div>
+                                <strong>{idea.user?.username || idea.author || 'Community'}</strong>
+                                <div className="muted" style={{fontSize:12}}>{idea.created_at ? new Date(idea.created_at).toLocaleString() : null}</div>
+                            </div>
+                            <div style={{textAlign:'right'}}>
+                                <div className="badge badge--muted">{idea.is_premium ? 'Premium' : 'Free'}</div>
+                            </div>
                         </div>
                     </div>
-                </div>
+
+                    <div className="card panel" style={{marginTop:16}}>
+                        <h3 style={{marginBottom:8}}>Product details</h3>
+                        <p className="muted" style={{marginBottom:12}}>A premium layout tailored for showcasing ideas like a product page — clear CTAs, attractive metadata and tags.</p>
+                        <div className="details-stats">
+                            <div className="stats-row">
+                                <div>
+                                    <div className="badge">⭐ {idea.score ?? 0}</div>
+                                    <div className="muted" style={{fontSize:12}}>Quality</div>
+                                </div>
+                                <div>
+                                    <div className="badge">👁️ {idea.views_count ?? 0}</div>
+                                    <div className="muted" style={{fontSize:12}}>Views</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
             </article>
 
             <section className="details-comments">
                 <div className="card">
                     <h3>Leave a comment</h3>
                     <form onSubmit={handleComment} className="form">
-                        <input
-                            type="text"
+                        <textarea
                             placeholder="Write a thoughtful comment..."
                             value={comment}
                             onChange={(e) => setComment(e.target.value)}
-                            className="input"
+                            className="textarea"
                         />
 
                         <div className="search-form__actions">
@@ -194,14 +219,18 @@ function IdeaDetails() {
                 </div>
 
                 <div className="comments-list">
-                    {idea.comments.map((comment) => (
-                        <div key={comment.id} className="comment-card">
+                    {idea.comments.map((c) => (
+                        <article key={c.id} className="comment-card">
                             <div className="comment-card__meta">
-                                <strong className="comment-card__author">Comment</strong>
-                                <span className="badge badge--muted">Community</span>
+                                <div>
+                                    <strong className="comment-card__author">{c.user?.username || 'Anonymous'}</strong>
+                                    <div className="muted" style={{fontSize:12}}>{c.created_at ? new Date(c.created_at).toLocaleString() : null}</div>
+                                </div>
+                                <div className="badge badge--muted">Community</div>
                             </div>
-                            <p className="comment-card__content">{comment.content}</p>
-                        </div>
+
+                            <p className="comment-card__content">{c.content}</p>
+                        </article>
                     ))}
                 </div>
             </section>
