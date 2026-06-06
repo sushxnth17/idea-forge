@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import { Link } from "react-router-dom";
 import AppLayout from "../components/AppLayout";
+import "../styles/feed.css";
 
 function Feed() {
     const [ideas, setIdeas] = useState([]);
@@ -62,46 +63,61 @@ function Feed() {
                         const commentCount = Array.isArray(idea.comments) ? idea.comments.length : 0;
 
                         return (
-                            <Link key={idea.id} to={`/ideas/${idea.id}`} className="feed-card card card--interactive">
-                                <div className="feed-card__rank">#{index + 1}</div>
+                            <Link
+                                key={idea.id}
+                                to={`/ideas/${idea.id}`}
+                                className="feed-card card card--interactive"
+                                data-rank={index + 1}
+                            >
+                                <div className="feed-card__votes" aria-hidden>
+                                    <div className="count">{idea.likes_count}</div>
+                                    <div className="label">votes</div>
+                                </div>
 
                                 <div className="feed-card__body">
                                     <div className="feed-card__topline">
                                         <span className="badge badge--muted">Public</span>
-                                        <span className="feed-card__signal">Featured submission</span>
+                                        { (idea.parent_id || idea.remix_of || idea.is_remix) && (
+                                            <span className="badge badge--remix" title="This idea is a remix">Remix</span>
+                                        ) }
+                                        <span className="feed-card__signal muted">{idea.featured ? 'Featured submission' : ''}</span>
                                     </div>
 
                                     <div className="feed-card__title-row">
                                         <h2 className="feed-card__title">{idea.title}</h2>
-                                        <span className="feed-card__chevron">View details</span>
+                                        <span className="feed-card__chevron muted">View details →</span>
                                     </div>
 
                                     <p className="feed-card__description">{idea.description}</p>
 
                                     {tags.length > 0 && (
                                         <div className="feed-card__tags" aria-label="Idea tags">
-                                            {tags.slice(0, 4).map((tag) => (
-                                                <span key={tag.id} className="tag-pill">
-                                                    #{tag.name}
-                                                </span>
+                                            {tags.slice(0, 6).map((tag) => (
+                                                <span key={tag.id} className="tag-pill">#{tag.name}</span>
                                             ))}
                                         </div>
                                     )}
-                                </div>
 
-                                <div className="feed-card__footer">
-                                    <div className="feed-card__engagement">
-                                        <span className="feed-card__engagement-item">
-                                            <span aria-hidden="true">❤️</span>
-                                            <span>{idea.likes_count}</span>
-                                        </span>
-                                        <span className="feed-card__engagement-item">
-                                            <span aria-hidden="true">💬</span>
-                                            <span>{commentCount}</span>
-                                        </span>
+                                    {idea.parent_id && (
+                                        <div className="feed-card__parent muted">
+                                            <Link to={`/ideas/${idea.parent_id}`} className="remix-parent">Remixed from #{idea.parent_id}</Link>
+                                        </div>
+                                    )}
+
+                                    <div className="feed-card__footer">
+                                        <div className="feed-card__engagement">
+                                            <span className="feed-card__engagement-item">
+                                                <span className="icon" aria-hidden>❤️</span>
+                                                <span>{idea.likes_count}</span>
+                                            </span>
+                                            <span className="feed-card__engagement-item">
+                                                <span className="icon" aria-hidden>💬</span>
+                                                <span>{commentCount}</span>
+                                            </span>
+                                        </div>
+
+                                        <span className="button button--ghost">Open idea</span>
                                     </div>
-
-                                    <span className="button button--ghost">Open idea</span>
                                 </div>
                             </Link>
                         );

@@ -1,0 +1,86 @@
+/* Feed specific styles — Product Hunt inspired neo‑brutalist cards */
+.feed-shell { display: grid; gap: 8px; margin-top: -24px; }
+
+.feed-hero { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 12px; margin-bottom: 8px; }
+.feed-hero__copy { flex: 1; }
+.feed-hero__meta { display: flex; gap: 10px; align-items: center; }
+.feed-hero__stat { text-align: center; }
+.feed-hero__stat-value { display: block; font-weight: 800; font-size: 1.02rem; color: var(--text-strong); }
+.feed-hero__stat-label { display: block; color: var(--text-muted); font-size: 0.78rem; }
+
+.feed-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  margin-top: 0;
+}
+
+.feed-card {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+  padding: 12px;
+  border-radius: 18px;
+  border: 1px solid rgba(150,169,216,0.18);
+  background: linear-gradient(180deg, var(--surface), var(--surface-strong));
+  transition: transform 200ms cubic-bezier(.2,.9,.2,1), box-shadow 220ms ease, border-color 160ms ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Hover: move up 4px, stronger hard shadow (no soft shadows) */
+.feed-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(109,124,255,0.38);
+  box-shadow: 0 32px 0 rgba(2,6,23,0.54); /* hard shadow line */
+}
+
+.feed-card__votes {
+  width: 74px;
+  min-width: 74px;
+  display: grid;
+  place-items: center;
+  gap: 6px;
+}
+
+.feed-card__votes .count {
+  font-weight: 900;
+  font-size: 1.28rem;
+  color: var(--accent-strong);
+}
+.feed-card__votes .label { font-size: 0.78rem; color: var(--text-muted); }
+
+.feed-card__body { flex: 1; display: grid; gap: 6px; }
+.feed-card__topline { display:flex; gap:8px; align-items:center; }
+.feed-card__title-row { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
+.feed-card__title { font-size:1.04rem; margin:0; color:var(--text-strong); }
+/* Increase contrast for description */
+.feed-card__description { margin: 0; color: var(--text-strong); opacity: 0.95; max-width: 70ch; }
+
+.feed-card__tags { display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
+
+.tag-pill { background: rgba(255,255,255,0.035); border: 1px solid rgba(150,169,216,0.08); color: var(--text-strong); }
+
+.feed-card__footer { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:6px; }
+.feed-card__engagement { display:flex; gap:12px; align-items:center; }
+.feed-card__engagement-item { display:inline-flex; gap:8px; align-items:center; font-weight:800; color:var(--text-muted); }
+.feed-card__engagement-item .icon { font-size:0.98rem; }
+
+.feed-card__rank { display:none; }
+
+/* Remix badge & parent */
+.badge--remix { background: linear-gradient(90deg, rgba(109,124,255,0.08), rgba(45,212,191,0.06)); border-color: rgba(109,124,255,0.22); color: var(--accent-strong); font-weight:900; }
+.remix-parent { color: var(--text-muted); font-size:0.9rem; text-decoration: none; border-left: 2px solid rgba(255,255,255,0.02); padding-left:8px; margin-left:6px; }
+
+/* Product Hunt style ribbon for top items */
+.feed-card[data-rank="1"] { border-color: rgba(251,191,36,0.24); }
+.feed-card[data-rank="1"] .feed-card__votes .count { color: var(--warning); }
+
+/* Responsive */
+@media (max-width: 820px) {
+  .feed-card { flex-direction: column; }
+  .feed-card__votes { width: 100%; min-width: auto; grid-auto-flow: column; justify-content: start; padding-left: 4px; }
+  .feed-card__body { width: 100%; }
+  .feed-card__footer { width: 100%; }
+  .feed-hero { flex-direction: column; align-items: flex-start; }
+}
