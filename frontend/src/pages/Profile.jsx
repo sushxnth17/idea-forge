@@ -62,7 +62,7 @@ function Profile() {
             <div className="profile-layout">
                 <div className="profile-card card">
                     <div className="profile-row profile-row--header" style={{alignItems:'center',gap:16}}>
-                        <div className="profile-avatar" style={{width:96,height:96,fontSize:36}}>{profile.username?.[0]?.toUpperCase()}</div>
+                        <div className="profile-avatar profile-avatar--xl">{profile.username?.[0]?.toUpperCase()}</div>
                         <div style={{flex:1}}>
                             <div style={{display:'flex',alignItems:'center',gap:12}}>
                                 <h2 style={{margin:0}}>{profile.username}</h2>
