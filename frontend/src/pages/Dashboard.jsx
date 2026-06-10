@@ -41,12 +41,7 @@ const featureOverview = [
     description: "Track updates, responses, and important signals.",
     icon: "🔔"
   },
-  {
-    to: "/profile",
-    title: "Creator profile",
-    description: "Review your identity and public-facing details.",
-    icon: "👤"
-  }
+  
 ];
 
 function Dashboard() {
@@ -67,9 +62,9 @@ function Dashboard() {
             </p>
 
             <div className="dashboard-hero__stats" aria-label="Dashboard status">
-              <span className="badge badge--success">Connected</span>
-              <span className="badge">FastAPI backend</span>
-              <span className="badge badge--muted">Live routes</span>
+              
+              
+              
             </div>
 
             <div className="dashboard-hero__actions">
@@ -83,33 +78,39 @@ function Dashboard() {
           </div>
 
           <aside className="dashboard-hero__panel card">
-            <div className="dashboard-hero__panel-copy">
-              <p className="dashboard-hero__panel-label">Today</p>
-              <h3>One place to build and review everything</h3>
-              <p className="muted">
-                Stay in flow with quick access to your core creation and discovery paths.
-              </p>
-            </div>
+  <div className="dashboard-hero__panel-copy">
+    <p className="dashboard-hero__panel-label">Account</p>
 
-            <div className="dashboard-hero__metrics">
-              <div className="dashboard-metric">
-                <span className="dashboard-metric__value">6</span>
-                <span className="dashboard-metric__label">Primary routes</span>
-              </div>
-              <div className="dashboard-metric">
-                <span className="dashboard-metric__value">3</span>
-                <span className="dashboard-metric__label">Quick actions</span>
-              </div>
-              <div className="dashboard-metric">
-                <span className="dashboard-metric__value">4</span>
-                <span className="dashboard-metric__label">Feature areas</span>
-              </div>
-            </div>
+    <h3>Manage your account</h3>
 
-            <button onClick={handleLogout} className="button button--secondary button--full">
-              Logout
-            </button>
-          </aside>
+    <p className="muted">
+      View your profile, check notifications, or sign out of your session.
+    </p>
+  </div>
+
+  <div className="dashboard-hero__actions">
+    <Link
+      to="/profile"
+      className="button button--primary"
+    >
+      Profile
+    </Link>
+
+    <Link
+      to="/notifications"
+      className="button button--secondary"
+    >
+      Notifications
+    </Link>
+  </div>
+
+  <button
+    onClick={handleLogout}
+    className="button button--secondary button--full"
+  >
+    Logout
+  </button>
+</aside>
         </section>
 
         <section className="dashboard-section">
@@ -118,9 +119,7 @@ function Dashboard() {
               <p className="page__eyebrow">Quick actions</p>
               <h2>Jump to the most common flows</h2>
             </div>
-            <p className="dashboard-section__copy muted">
-              Use these cards to move directly into the tasks you touch most often.
-            </p>
+            
           </div>
 
           <div className="dashboard-actions-grid">
@@ -143,9 +142,7 @@ function Dashboard() {
               <p className="page__eyebrow">Feature overview</p>
               <h2>Explore the product surface</h2>
             </div>
-            <p className="dashboard-section__copy muted">
-              Each card points to an existing route so you can move through the app without changing context.
-            </p>
+           
           </div>
 
           <div className="dashboard-features-grid">
