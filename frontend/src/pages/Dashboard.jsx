@@ -67,9 +67,9 @@ function Dashboard() {
             </p>
 
             <div className="dashboard-hero__stats" aria-label="Dashboard status">
-              <span className="badge badge--success">Connected</span>
-              <span className="badge">FastAPI backend</span>
-              <span className="badge badge--muted">Live routes</span>
+              
+              
+              
             </div>
 
             <div className="dashboard-hero__actions">
@@ -92,18 +92,7 @@ function Dashboard() {
             </div>
 
             <div className="dashboard-hero__metrics">
-              <div className="dashboard-metric">
-                <span className="dashboard-metric__value">6</span>
-                <span className="dashboard-metric__label">Primary routes</span>
-              </div>
-              <div className="dashboard-metric">
-                <span className="dashboard-metric__value">3</span>
-                <span className="dashboard-metric__label">Quick actions</span>
-              </div>
-              <div className="dashboard-metric">
-                <span className="dashboard-metric__value">4</span>
-                <span className="dashboard-metric__label">Feature areas</span>
-              </div>
+             
             </div>
 
             <button onClick={handleLogout} className="button button--secondary button--full">
