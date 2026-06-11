@@ -1,237 +1,280 @@
-### 🚀 IdeaForge
+# 🚀 IdeaForge
 
-IdeaForge is a collaborative innovation platform where users can share ideas, improve existing concepts, and work together to transform simple thoughts into impactful solutions, projects, or startup opportunities.
+IdeaForge is a full-stack collaborative innovation platform where users can share ideas, discover community-driven solutions, and contribute to the growth of existing concepts.
 
-The platform encourages community-driven creativity by allowing people to build upon each other's ideas through discussions, contributions, likes, remixes, and collaboration.
+The platform is designed to transform raw ideas into meaningful projects by enabling discussion, engagement, and collaboration among creators.
 
 ---
 
-### ✨ Features
+## 🌐 Live Demo
 
-## 🔐 Authentication
+**Frontend:** https://ideafor.netlify.app
+
+**Backend API:** https://idea-forge-l7b1.onrender.com
+
+**API Documentation:** https://idea-forge-l7b1.onrender.com/docs
+
+---
+
+## ✨ Features
+
+### 🔐 Authentication
 
 - User Registration
 - Secure Login with JWT Authentication
 - Protected Routes
+- Session Management
 - Logout Functionality
 
-## 💡 Ideas
+### 💡 Idea Management
 
-- Create New Ideas
-- Public Idea Feed
-- Detailed Idea Pages
-- Idea Remixing System
-- Trending Ideas
+- Create Ideas
+- Browse Public Feed
+- View Detailed Idea Pages
+- Trending Ideas Section
+- Idea Discovery System
 
-## ❤️ Social Interactions
+### ❤️ Community Features
 
 - Like Ideas
 - Comment on Ideas
 - Bookmark Ideas
-- Notifications System
 - Follow Users
+- Notifications System
 
-## 👤 User Features
+### 👤 User Profiles
 
-- User Profiles
-- Profile Updates
-- Bio & Profile Picture Support
+- Personalized User Profiles
+- Update Profile Information
+- User Bio Support
+- View User Contributions
 
 ---
 
 ## 🛠️ Tech Stack
 
-Frontend
+### Frontend
 
 - React
 - Vite
 - React Router DOM
 - Axios
 - JavaScript
+- CSS
 
-Backend
+### Backend
 
 - FastAPI
-- PostgreSQL
 - SQLAlchemy
+- PostgreSQL
 - Pydantic
 - JWT Authentication
+- Passlib (Password Hashing)
+
+### Database & Deployment
+
+- PostgreSQL (Neon)
+- Render (Backend Deployment)
+- Netlify (Frontend Deployment)
 
 ---
 
-⚙️ Backend Setup
+## 🏗️ Project Structure
 
-1️⃣ Move to Backend Folder
+```text
+IdeaForge/
+│
+├── backend/
+│   ├── app/
+│   ├── routes/
+│   ├── models/
+│   ├── schemas/
+│   └── database/
+│
+├── frontend/
+│   ├── src/
+│   ├── components/
+│   ├── pages/
+│   ├── services/
+│   └── styles/
+│
+└── README.md
+```
 
+---
+
+## ⚙️ Backend Setup
+
+### 1. Navigate to Backend
+
+```bash
 cd backend
+```
 
-2️⃣ Create Virtual Environment
+### 2. Create Virtual Environment
 
-Windows
+#### Windows
 
+```bash
 python -m venv venv
 venv\Scripts\activate
+```
 
-Mac/Linux
+#### Mac/Linux
 
+```bash
 python3 -m venv venv
 source venv/bin/activate
+```
 
----
+### 3. Install Dependencies
 
-3️⃣ Install Dependencies
-
+```bash
 pip install -r requirements.txt
+```
 
----
+### 4. Configure Environment Variables
 
-4️⃣ Run Backend Server
+Create a `.env` file:
 
+```env
+DATABASE_URL=your_database_connection_string
+```
+
+### 5. Run Backend Server
+
+```bash
 uvicorn app.main:app --reload
+```
 
-Backend will run at:
+Backend:
 
+```text
 http://127.0.0.1:8000
+```
 
-Swagger Documentation:
+Swagger Docs:
 
+```text
 http://127.0.0.1:8000/docs
+```
 
 ---
 
-💻 Frontend Setup
+## 💻 Frontend Setup
 
-1️⃣ Move to Frontend Folder
+### 1. Navigate to Frontend
 
+```bash
 cd frontend
+```
 
----
+### 2. Install Dependencies
 
-2️⃣ Install Dependencies
-
+```bash
 npm install
+```
 
----
+### 3. Start Development Server
 
-3️⃣ Start Frontend
-
+```bash
 npm run dev
+```
 
-Frontend will run at:
+Frontend:
 
+```text
 http://localhost:5173
+```
 
 ---
 
-### 🔗 API Integration
+## 🔗 API Integration
 
-Frontend communicates with FastAPI backend using Axios.
+IdeaForge uses Axios to communicate with the FastAPI backend.
 
-Authentication is handled using JWT tokens stored in local storage.
+Authentication is handled through JWT access tokens stored in the browser and attached to authenticated API requests.
 
 ---
 
-### 🗄️ Database
+## 🗄️ Database Design
 
-- PostgreSQL
-- SQLAlchemy ORM
-- Relationship-based schema design
+The application uses PostgreSQL with SQLAlchemy ORM.
 
-Main tables:
+### Core Entities
 
 - Users
 - Ideas
 - Comments
 - Likes
-- Tags
 - Bookmarks
 - Notifications
 - Follows
 
----
-
-### 📸 Current Functionalities
-
-- ✅ Authentication System
-- ✅ Public Feed
-- ✅ Trending Ideas
-- ✅ Idea Details Page
-- ✅ Likes System
-- ✅ Comments System
-- ✅ Notifications
-- ✅ Create Idea
-- ✅ User Profiles
-- ✅ Protected Routes
+The schema is designed using relational database principles to support social interactions and idea collaboration.
 
 ---
 
-### 🚀 Future Enhancements
+## ✅ Current Functionality
+
+- JWT Authentication
+- User Registration & Login
+- Public Idea Feed
+- Trending Ideas
+- Create Idea
+- Idea Details Page
+- Likes System
+- Comments System
+- Bookmarks
+- Follow Users
+- Notifications
+- User Profiles
+- Protected Routes
+- Full Deployment Pipeline
+
+---
+
+## 🚀 Future Roadmap
+
+### AI Features
 
 - AI-Powered Idea Summaries
 - Semantic Idea Search
+- Idea Similarity Detection
+
+### Collaboration Features
+
+- Real-Time Notifications
+- Idea Collaboration Rooms
+- Team-Based Idea Development
+- Idea Branching System
+
+### Platform Improvements
+
 - Contributor Reputation System
 - Innovation Graph Visualization
-- Real-time Notifications
-- Chat System
-- Dark/Light Theme Toggle
-- Mobile Responsive UI
-- Idea Collaboration Rooms
+- Dark / Light Theme
+- Enhanced Mobile Experience
 
 ---
 
-### 🧠 Inspiration
 
-IdeaForge was built to encourage collaborative innovation and help people turn raw ideas into meaningful creations through community participation.
+## 🧠 Inspiration
 
----
+Many great ideas are lost because they are never shared, discussed, or improved collaboratively.
 
-### 📜 License
-
-This project is developed for learning, innovation, and collaborative development purposes.
-## Windows
-```bash
-venv\Scripts\activate
-```
-
-## Mac/Linux
-```bash
-source venv/bin/activate
-```
-
-Install dependencies:
-
-```bash
-python -m pip install -r requirements.txt
-```
-
-Run backend server:
-
-```bash
-uvicorn app.main:app --reload
-```
+IdeaForge was built to provide a space where creators can publish ideas, receive feedback, discover opportunities, and work together to turn concepts into reality.
 
 ---
 
-# Frontend Setup
+## 📜 License
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
+This project is licensed under the MIT License.
 
 ---
 
-# Future Plans
+## 👨‍💻 Author
 
-- AI-powered idea summaries
-- Idea branching system
-- Innovation graph visualization
-- Contributor reputation system
-- Semantic search
+**Sushanth**
 
----
-
-# License
-
-MIT License
+Building AI, software engineering, and innovation-focused projects.
