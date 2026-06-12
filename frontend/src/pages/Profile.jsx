@@ -62,7 +62,19 @@ function Profile() {
             <div className="profile-layout">
                 <div className="profile-card card">
                     <div className="profile-row profile-row--header" style={{alignItems:'center',gap:16}}>
-                        <div className="profile-avatar profile-avatar--xl">{profile.username?.[0]?.toUpperCase()}</div>
+                                                {
+                            profile.profile_picture ? (
+                                <img
+                                    src={profile.profile_picture}
+                                    alt={profile.username}
+                                    className="profile-avatar profile-avatar--xl"
+                                />
+                            ) : (
+                                <div className="profile-avatar profile-avatar--xl">
+                                    {profile.username?.[0]?.toUpperCase()}
+                                </div>
+                            )
+                        }
                         <div style={{flex:1}}>
                             <div style={{display:'flex',alignItems:'center',gap:12}}>
                                 <h2 style={{margin:0}}>{profile.username}</h2>
@@ -72,7 +84,7 @@ function Profile() {
                         </div>
                         <div className="profile-actions" style={{display:'flex',flexDirection:'column',gap:8}}>
                             <Link to={`/users/${profile.id}/ideas`} className="button button--primary">📄 My Ideas</Link>
-                            <button className="button" type="button">✏️ Edit Profile</button>
+                            <Link to="/edit-profile" className="button" >✏️ Edit Profile</Link>
                         </div>
                     </div>
 

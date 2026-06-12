@@ -65,13 +65,6 @@ function Navbar() {
                         </NavLink>
                     ))}
                 </nav>
-
-                <div className="app-nav__status" aria-hidden="true">
-                    <span className="app-nav__status-pill">
-                        <span className="app-nav__status-dot" />
-                        Productive mode
-                    </span>
-                </div>
             </div>
         </header>
     );
