@@ -28,3 +28,7 @@ def create_tables() -> None:
 @app.get("/")
 def root():
 	return {"message": "IdeaForge Backend Running"}
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
