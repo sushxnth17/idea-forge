@@ -13,6 +13,7 @@ import Search from "./pages/Search";
 import ProtectedRoute from "./components/ProtectedRoute";
 import UserIdeas from "./pages/UserIdeas";
 import Bookmarks from "./pages/Bookmarks";
+import EditProfile from "./pages/EditProfile";
 
 function App() {
   return (
@@ -121,6 +122,15 @@ function App() {
           element={
             <ProtectedRoute>
               <Bookmarks />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/edit-profile"
+          element={
+            <ProtectedRoute>
+              <EditProfile />
             </ProtectedRoute>
           }
         />
