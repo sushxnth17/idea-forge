@@ -1,101 +1,200 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
 import AppLayout from "../components/AppLayout";
 
-function Search() {
+const avatarColors = [
+    "#6d7cff", // Accent blue
+    "#37d39b", // Success green
+    "#f3bf4a", // Warning yellow
+    "#f66b86", // Danger pink
+    "#a855f7", // Purple
+    "#ec4899", // Pink
+    "#06b6d4", // Cyan
+    "#f97316"  // Orange
+];
 
+function Search() {
     const [query, setQuery] = useState("");
     const [results, setResults] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [currentUser, setCurrentUser] = useState(null);
 
-    async function handleSearch(e) {
+    useEffect(() => {
+        async function fetchMe() {
+            try {
+                const response = await api.get("/users/profile");
+                setCurrentUser(response.data);
+            } catch (error) {
+                console.log("Could not load logged-in user profile:", error);
+            }
+        }
+        fetchMe();
+    }, []);
 
-        e.preventDefault();
-
+    const performSearch = async (searchQuery) => {
+        if (!searchQuery.trim()) {
+            setResults([]);
+            return;
+        }
         try {
-
-            const response = await api.get(
-                `/search?query=${query}`
-            );
-
+            const response = await api.get(`/users/search?query=${searchQuery}`);
             setResults(response.data);
-
-        } catch(error) {
+        } catch (error) {
             console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (!query.trim()) {
+            setResults([]);
+            setLoading(false);
+            return;
+        }
+
+        setLoading(true);
+        const delayDebounceFn = setTimeout(() => {
+            performSearch(query);
+        }, 400); // 400ms debounce
+
+        return () => clearTimeout(delayDebounceFn);
+    }, [query]);
+
+    async function handleFollow(userId) {
+        try {
+            await api.post(`/users/follow/${userId}`);
+            alert("Followed successfully!");
+            // Refresh results to update followers count
+            performSearch(query);
+        } catch (error) {
+            console.log(error);
+            if (error.response?.status === 400) {
+                alert("You are already following this user!");
+            } else {
+                alert("Failed to follow user.");
+            }
         }
     }
+
+    const getAvatarColor = (id) => {
+        return avatarColors[id % avatarColors.length];
+    };
+
+    const getAvatarInitials = (user) => {
+        if (!user.username) return "U";
+        return user.username.slice(0, 2).toUpperCase();
+    };
 
     return (
         <AppLayout>
             <section className="page__header">
                 <p className="page__eyebrow">Discovery</p>
-                <h1>Search Ideas</h1>
-                <p className="page__lead muted">Search through ideas using the live backend query.</p>
+                <h1>Search Creators</h1>
+                <p className="page__lead muted">Search for builders, designers, and creators across the IdeaForge platform.</p>
             </section>
-            <form onSubmit={handleSearch} className="search-form card" aria-label="Search ideas">
+
+            <div className="search-form card" style={{ marginBottom: "24px" }} aria-label="Search creators">
                 <div className="form__field">
-                    <label className="form__label" htmlFor="idea-search">
-                        Search term
+                    <label className="form__label" htmlFor="creator-search">
+                        Search by username
                     </label>
                     <input
-                        id="idea-search"
+                        id="creator-search"
                         type="text"
-                        placeholder="Search ideas..."
+                        placeholder="Type a username..."
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                         className="search-field"
+                        autoFocus
                     />
-                    <p className="muted" style={{marginTop:8, fontSize:14}}>Try searching for topics like <strong>AI</strong>, <strong>productivity</strong>, or <strong>community</strong>.</p>
+                    <p className="muted" style={{ marginTop: 8, fontSize: 14 }}>
+                        Results load automatically as you type. Try typing test usernames.
+                    </p>
                 </div>
+            </div>
 
-                <div className="search-form__actions">
-                    <button type="submit" className="button button--primary">
-                        Search
-                    </button>
+            {loading && (
+                <div className="loading-state card">
+                    <h3>Searching...</h3>
+                    <p className="muted">Retrieving creator records matching "{query}".</p>
                 </div>
-            </form>
-            <div className="section-grid">
-                {results.length === 0 ? (
-                    query ? (
-                        <div className="card">
-                            <h3>No results</h3>
-                            <p className="muted">We couldn't find any ideas matching <strong>"{query}"</strong>. Try different keywords or broader terms.</p>
-                        </div>
+            )}
+
+            {!loading && (
+                <div className="section-grid">
+                    {results.length === 0 ? (
+                        query ? (
+                            <div className="card">
+                                <h3>No creators found</h3>
+                                <p className="muted">We couldn't find any creators matching <strong>"{query}"</strong>. Try a different username.</p>
+                            </div>
+                        ) : (
+                            <div className="card">
+                                <h3>Start exploring</h3>
+                                <p className="muted">Type a username in the search field above to discover builders and creators.</p>
+                            </div>
+                        )
                     ) : (
-                        <div className="card">
-                            <h3>Start exploring</h3>
-                            <p className="muted">Enter a search term to discover ideas. Use short topic keywords for best results.</p>
-                        </div>
-                    )
-                ) : (
-                    results.map((idea) => (
-                        <Link key={idea.id} to={`/ideas/${idea.id}`} className="feed-card card card--interactive">
-                            <div className="feed-card__body card__body">
-                                <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',gap:12}}>
-                                    <div style={{flex:1}}>
-                                        <h3 className="feed-card__title">{idea.title}</h3>
-                                        <p className="feed-card__description muted">{idea.description}</p>
-                                        {idea.tags && idea.tags.length > 0 && (
-                                            <div className="feed-card__tags" style={{marginTop:8}} aria-label="Idea tags">
-                                                {idea.tags.slice(0,4).map(t => (
-                                                    <span key={t.id} className="tag-pill">#{t.name}</span>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div style={{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:8}}>
-                                        <div className="feed-card__likes">
-                                            <span className="badge">❤️ {idea.likes_count}</span>
-                                            <span className="badge" style={{marginLeft:8}}>💬 {idea.comments?.length || 0}</span>
+                        results.map((user) => (
+                            <article key={user.id} className="search-card card">
+                                <div className="search-card__body">
+                                    <div className="search-card__profile-section">
+                                        <div 
+                                            className="search-card__avatar"
+                                            style={{ backgroundColor: getAvatarColor(user.id) }}
+                                        >
+                                            {user.profile_picture ? (
+                                                <img 
+                                                    src={user.profile_picture} 
+                                                    alt={user.username} 
+                                                    className="search-card__avatar-img" 
+                                                />
+                                            ) : (
+                                                <span className="search-card__avatar-text">{getAvatarInitials(user)}</span>
+                                            )}
+                                        </div>
+                                        
+                                        <div className="search-card__meta">
+                                            <h3 className="search-card__username">@{user.username}</h3>
+                                            <span className="badge badge--followers">👥 {user.followers_count ?? 0} Followers</span>
                                         </div>
                                     </div>
+                                    
+                                    <p className="search-card__bio">
+                                        {user.bio ? (user.bio.length > 90 ? `${user.bio.slice(0, 90)}...` : user.bio) : "No bio provided."}
+                                    </p>
                                 </div>
-                            </div>
-                        </Link>
-                    ))
-                )}
-            </div>
+                                
+                                <footer className="search-card__actions">
+                                    <Link 
+                                        to={user.id === currentUser?.id ? "/profile" : `/users/${user.id}/ideas`} 
+                                        className="button button--secondary search-card__btn"
+                                    >
+                                        View Profile
+                                    </Link>
+                                    <Link 
+                                        to={`/users/${user.id}/ideas`} 
+                                        className="button button--secondary search-card__btn"
+                                    >
+                                        View Ideas
+                                    </Link>
+                                    {user.id !== currentUser?.id && (
+                                        <button
+                                            type="button"
+                                            onClick={() => handleFollow(user.id)}
+                                            className="button button--primary search-card__btn"
+                                        >
+                                            Follow
+                                        </button>
+                                    )}
+                                </footer>
+                            </article>
+                        ))
+                    )}
+                </div>
+            )}
         </AppLayout>
     );
 }

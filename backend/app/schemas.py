@@ -20,6 +20,18 @@ class UserResponse(BaseModel):
 	model_config = ConfigDict(from_attributes=True)
 
 
+class UserSearchResponse(BaseModel):
+	id: int
+	username: str
+	email: str
+	bio: str | None = None
+	profile_picture: str | None = None
+	created_at: datetime
+	followers_count: int = 0
+
+	model_config = ConfigDict(from_attributes=True)
+
+
 class UserProfileUpdate(BaseModel):
 	bio: str | None = None
 	profile_picture: str | None = None
