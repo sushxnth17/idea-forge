@@ -1,7 +1,9 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: "https://idea-forge-l7b1.onrender.com"
+    baseURL: window.location.hostname === "localhost" 
+        ? "http://localhost:8000" 
+        : "https://idea-forge-l7b1.onrender.com"
 });
 
 api.interceptors.request.use((config) => {

@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from ..database import get_db
 from ..models import User, Notification, Follow,Idea
-from ..schemas import (UserCreate,UserResponse,UserLogin,Token,UserProfileUpdate,NotificationResponse,FollowResponse,IdeaResponse)
+from ..schemas import (UserCreate,UserResponse,UserLogin,Token,UserProfileUpdate,NotificationResponse,FollowResponse,IdeaResponse,UserSearchResponse)
 from ..utils import hash_password, verify_password
 from ..auth import create_access_token, get_current_user
 
@@ -95,6 +95,21 @@ def update_profile(
 	db.refresh(current_user)
 
 	return current_user
+
+@router.get("/search", response_model=list[UserSearchResponse])
+def search_users(
+	query: str,
+	current_user: User = Depends(get_current_user),
+	db: Session = Depends(get_db),
+):
+	users = (
+		db.query(User)
+		.filter(User.username.ilike(f"%{query}%"))
+		.all()
+	)
+	for u in users:
+		u.followers_count = len(u.followers)
+	return users
 
 @router.get(
 	"/notifications",
