@@ -16,7 +16,7 @@
   background: #e9d5ff !important; /* Soft lavender hero panel */
   padding: 24px;
   box-sizing: border-box;
-  box-shadow: 6px 6px 0 #000000 !important;
+  box-shadow: none !important;
 }
 
 .feed-hero__copy {
@@ -43,7 +43,7 @@
   border-radius: 16px !important;
   border: 3px solid #000000 !important; /* Thick black outline */
   background: #fef9c3 !important; /* Solid warm soft yellow background */
-  box-shadow: 6px 6px 0 #000000 !important; /* Hard shadow */
+  box-shadow: none !important; /* Hard shadow */
   transition: transform 150ms ease, box-shadow 150ms ease;
   position: relative;
   overflow: hidden;
@@ -53,7 +53,7 @@
 /* Feed Card Hover translation */
 .feed-card:hover {
   transform: translate(-3px, -3px) !important;
-  box-shadow: 9px 9px 0 #000000 !important;
+  box-shadow: none !important;
 }
 
 /* Creator Header */
@@ -85,7 +85,7 @@
   font-size: 0.85rem;
   color: #ffffff;
   flex-shrink: 0;
-  box-shadow: 1px 1px 0 #000000 !important;
+  box-shadow: none !important;
 }
 
 .feed-card__avatar-img {
@@ -176,7 +176,7 @@
   padding: 8px 12px;
   border-radius: var(--radius-sm);
   width: fit-content;
-  box-shadow: 2px 2px 0 #000000 !important;
+  box-shadow: none !important;
   font-weight: 700;
 }
 
@@ -211,7 +211,7 @@
   font-weight: 800;
   cursor: pointer;
   text-decoration: none;
-  box-shadow: 2px 2px 0 #000000 !important; /* Hard shadow */
+  box-shadow: none !important; /* Hard shadow */
   transition: transform 100ms ease, box-shadow 100ms ease, background-color 100ms ease;
   outline: none;
 }
@@ -224,12 +224,12 @@
 /* Button transitions */
 .feed-card__action-btn:hover {
   transform: translate(-1px, -1px) !important;
-  box-shadow: 3px 3px 0 #000000 !important;
+  box-shadow: none !important;
 }
 
 .feed-card__action-btn:active {
   transform: translate(1px, 1px) !important;
-  box-shadow: 1px 1px 0 #000000 !important;
+  box-shadow: none !important;
 }
 
 /* Hover highlights (solid colors only) */
@@ -287,7 +287,7 @@
   background: #ffffff !important;
   padding: 8px 16px;
   border-radius: 12px;
-  box-shadow: 3px 3px 0 #000000 !important;
+  box-shadow: none !important;
 }
 
 /* ==========================================================================
@@ -303,7 +303,7 @@
   background: #e9d5ff !important; /* Soft lavender */
   border: 3px solid #000000 !important;
   border-radius: 16px !important;
-  box-shadow: 6px 6px 0 #000000 !important;
+  box-shadow: none !important;
   color: #000000 !important;
 }
 
@@ -331,7 +331,7 @@
   font-size: 0.98rem;
   color: #ffffff;
   flex-shrink: 0;
-  box-shadow: 2px 2px 0 #000000 !important;
+  box-shadow: none !important;
 }
 
 .search-card__avatar-img {
