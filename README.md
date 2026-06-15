@@ -1,4 +1,4 @@
-# 🚀 IdeaForge
+#  IdeaForge
 
 IdeaForge is a full-stack collaborative innovation platform where users can share ideas, discover community-driven solutions, and contribute to the growth of existing concepts.
 
