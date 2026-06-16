@@ -20,6 +20,22 @@ class UserResponse(BaseModel):
 	model_config = ConfigDict(from_attributes=True)
 
 
+class IdeaOwnerResponse(BaseModel):
+	id: int
+	username: str
+	profile_picture: str | None = None
+
+	model_config = ConfigDict(from_attributes=True)
+
+
+class CommentUserResponse(BaseModel):
+	id: int
+	username: str
+	profile_picture: str | None = None
+
+	model_config = ConfigDict(from_attributes=True)
+
+
 class UserSearchResponse(BaseModel):
 	id: int
 	username: str
@@ -53,6 +69,7 @@ class CommentResponse(BaseModel):
 	created_at: datetime
 	user_id: int
 	idea_id: int
+	user: CommentUserResponse | None = None
 
 	model_config = ConfigDict(from_attributes=True)
 
@@ -75,6 +92,7 @@ class IdeaResponse(BaseModel):
 	parent_idea_id: int | None = None
 	created_at: datetime
 	owner_id: int
+	owner: IdeaOwnerResponse | None = None
 
 	model_config = ConfigDict(from_attributes=True)
 
@@ -106,5 +124,19 @@ class FollowResponse(BaseModel):
 	id: int
 	follower_id: int
 	following_id: int
+
+	model_config = ConfigDict(from_attributes=True)
+
+
+class PublicUserProfileResponse(BaseModel):
+	id: int
+	username: str
+	bio: str | None = None
+	profile_picture: str | None = None
+	created_at: datetime
+	followers_count: int
+	following_count: int
+	ideas_count: int
+	is_following: bool
 
 	model_config = ConfigDict(from_attributes=True)

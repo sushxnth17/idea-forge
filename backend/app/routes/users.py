@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from ..database import get_db
 from ..models import User, Notification, Follow,Idea
-from ..schemas import (UserCreate,UserResponse,UserLogin,Token,UserProfileUpdate,NotificationResponse,FollowResponse,IdeaResponse,UserSearchResponse)
+from ..schemas import (UserCreate,UserResponse,UserLogin,Token,UserProfileUpdate,NotificationResponse,FollowResponse,IdeaResponse,UserSearchResponse,PublicUserProfileResponse)
 from ..utils import hash_password, verify_password
 from ..auth import create_access_token, get_current_user
 
@@ -207,6 +207,13 @@ def follow_user(
 	)
 
 	db.add(new_follow)
+
+	notification = Notification(
+		message=f"{current_user.username} started following you",
+		user_id=user_id
+	)
+	db.add(notification)
+
 	db.commit()
 	db.refresh(new_follow)
 
@@ -255,3 +262,70 @@ def get_user_ideas(
     )
 
     return ideas
+
+
+@router.get("/{user_id}", response_model=PublicUserProfileResponse)
+def get_public_profile(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
+    is_following = db.query(Follow).filter(
+        Follow.follower_id == current_user.id,
+        Follow.following_id == user_id
+    ).first() is not None
+
+    ideas_count = db.query(Idea).filter(
+        Idea.owner_id == user_id,
+        Idea.is_public == True
+    ).count()
+
+    followers_count = db.query(Follow).filter(Follow.following_id == user_id).count()
+    following_count = db.query(Follow).filter(Follow.follower_id == user_id).count()
+
+    return {
+        "id": user.id,
+        "username": user.username,
+        "bio": user.bio,
+        "profile_picture": user.profile_picture,
+        "created_at": user.created_at,
+        "followers_count": followers_count,
+        "following_count": following_count,
+        "ideas_count": ideas_count,
+        "is_following": is_following
+    }
+
+
+@router.delete("/follow/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+def unfollow_user(
+    user_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if current_user.id == user_id:
+        raise HTTPException(
+            status_code=400,
+            detail="You cannot unfollow yourself"
+        )
+
+    follow = db.query(Follow).filter(
+        Follow.follower_id == current_user.id,
+        Follow.following_id == user_id
+    ).first()
+
+    if not follow:
+        raise HTTPException(
+            status_code=404,
+            detail="You are not following this user"
+        )
+
+    db.delete(follow)
+    db.commit()
+    return None
