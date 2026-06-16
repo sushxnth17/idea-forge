@@ -18,7 +18,7 @@ The platform is designed to transform raw ideas into meaningful projects by enab
 
 ## ✨ Features
 
-### 🔐 Authentication
+###  Authentication
 
 - User Registration
 - Secure Login with JWT Authentication
@@ -26,7 +26,7 @@ The platform is designed to transform raw ideas into meaningful projects by enab
 - Session Management
 - Logout Functionality
 
-### 💡 Idea Management
+###  Idea Management
 
 - Create Ideas
 - Browse Public Feed
@@ -34,7 +34,7 @@ The platform is designed to transform raw ideas into meaningful projects by enab
 - Trending Ideas Section
 - Idea Discovery System
 
-### ❤️ Community Features
+###  Community Features
 
 - Like Ideas
 - Comment on Ideas
@@ -42,7 +42,7 @@ The platform is designed to transform raw ideas into meaningful projects by enab
 - Follow Users
 - Notifications System
 
-### 👤 User Profiles
+###  User Profiles
 
 - Personalized User Profiles
 - Update Profile Information
