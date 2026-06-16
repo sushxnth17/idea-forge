@@ -96,6 +96,9 @@ function Feed() {
     };
 
     const getCreatorUsername = (idea) => {
+        if (idea.owner?.username) {
+            return `@${idea.owner.username}`;
+        }
         if (currentUser && idea.owner_id === currentUser.id) {
             return `@${currentUser.username}`;
         }
@@ -103,6 +106,9 @@ function Feed() {
     };
 
     const getAvatarInitials = (idea) => {
+        if (idea.owner?.username) {
+            return idea.owner.username.slice(0, 2).toUpperCase();
+        }
         if (currentUser && idea.owner_id === currentUser.id) {
             return currentUser.username.slice(0, 2).toUpperCase();
         }
@@ -148,12 +154,22 @@ function Feed() {
                             <div key={idea.id} className="feed-card-wrapper">
                                 <article className="feed-card card">
                                     <header className="feed-card__header">
-                                        <div className="feed-card__creator-info">
+                                        <Link 
+                                            to={currentUser && idea.owner_id === currentUser.id ? "/profile" : `/user/${idea.owner_id}`}
+                                            className="feed-card__creator-info"
+                                            style={{ textDecoration: "none", color: "inherit", display: "flex", alignItems: "center", gap: 12 }}
+                                        >
                                             <div 
                                                 className="feed-card__avatar" 
                                                 style={{ backgroundColor: getAvatarColor(idea.owner_id) }}
                                             >
-                                                {currentUser && idea.owner_id === currentUser.id && currentUser.profile_picture ? (
+                                                {idea.owner?.profile_picture ? (
+                                                    <img 
+                                                        src={idea.owner.profile_picture} 
+                                                        alt={idea.owner.username} 
+                                                        className="feed-card__avatar-img" 
+                                                    />
+                                                ) : currentUser && idea.owner_id === currentUser.id && currentUser.profile_picture ? (
                                                     <img 
                                                         src={currentUser.profile_picture} 
                                                         alt={currentUser.username} 
@@ -164,13 +180,13 @@ function Feed() {
                                                 )}
                                             </div>
                                             <div className="feed-card__creator-meta">
-                                                <span className="feed-card__username">{getCreatorUsername(idea)}</span>
+                                                <span className="feed-card__username" style={{ textDecoration: "underline" }}>{getCreatorUsername(idea)}</span>
                                                 <span className="feed-card__date-separator">•</span>
                                                 <time className="feed-card__date" dateTime={idea.created_at}>
                                                     {formatDate(idea.created_at)}
                                                 </time>
                                             </div>
-                                        </div>
+                                        </Link>
                                         <div className="feed-card__header-badges">
                                             {idea.featured && <span className="badge badge--success">Featured</span>}
                                             {idea.parent_idea_id && <span className="badge badge--remix">Remix</span>}

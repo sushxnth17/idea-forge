@@ -14,6 +14,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import UserIdeas from "./pages/UserIdeas";
 import Bookmarks from "./pages/Bookmarks";
 import EditProfile from "./pages/EditProfile";
+import PublicProfile from "./pages/PublicProfile";
 
 function App() {
   return (
@@ -131,6 +132,15 @@ function App() {
           element={
             <ProtectedRoute>
               <EditProfile />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/user/:id"
+          element={
+            <ProtectedRoute>
+              <PublicProfile />
             </ProtectedRoute>
           }
         />

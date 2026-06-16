@@ -169,13 +169,13 @@ function Search() {
                                 
                                 <footer className="search-card__actions">
                                     <Link 
-                                        to={user.id === currentUser?.id ? "/profile" : `/users/${user.id}/ideas`} 
+                                        to={user.id === currentUser?.id ? "/profile" : `/user/${user.id}`} 
                                         className="button button--secondary search-card__btn"
                                     >
                                         View Profile
                                     </Link>
                                     <Link 
-                                        to={`/users/${user.id}/ideas`} 
+                                        to={user.id === currentUser?.id ? "/profile" : `/user/${user.id}`} 
                                         className="button button--secondary search-card__btn"
                                     >
                                         View Ideas

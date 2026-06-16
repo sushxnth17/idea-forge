@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
 import api from "../services/api";
 import AppLayout from "../components/AppLayout";
-import { Link } from "react-router-dom";
 import "../styles/profile.css";
 import "../styles/feed.css";
 
@@ -16,53 +16,82 @@ const avatarColors = [
     "#f97316"  // Orange
 ];
 
-function Profile() {
+function PublicProfile() {
+    const { id } = useParams();
     const [profile, setProfile] = useState(null);
-    const [followersCount, setFollowersCount] = useState(0);
-    const [followingCount, setFollowingCount] = useState(0);
     const [ideas, setIdeas] = useState([]);
+    const [currentUser, setCurrentUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
     const getAvatarColor = (userId) => {
         return avatarColors[userId % avatarColors.length];
     };
 
-    const loadProfile = async () => {
+    const loadProfileData = async () => {
         try {
-            const response = await api.get("/users/profile");
-            setProfile(response.data);
+            // Load public profile details
+            const profileRes = await api.get(`/users/${id}`);
+            setProfile(profileRes.data);
 
-            const followersResponse = await api.get(
-                `/users/followers/${response.data.id}`
-            );
-
-            const followingResponse = await api.get(
-                `/users/following/${response.data.id}`
-            );
-
-            const ideasResponse = await api.get("/ideas");
-
-            setFollowersCount(followersResponse.data.length);
-            setFollowingCount(followingResponse.data.length);
-            setIdeas(ideasResponse.data);
+            // Load user's public ideas
+            const ideasRes = await api.get(`/users/${id}/ideas`);
+            setIdeas(ideasRes.data);
         } catch (error) {
-            console.log("Error loading profile details:", error);
+            console.error("Error loading public profile:", error);
         } finally {
             setLoading(false);
         }
     };
 
+    const loadCurrentUser = async () => {
+        try {
+            const response = await api.get("/users/profile");
+            setCurrentUser(response.data);
+        } catch (error) {
+            console.log("Could not load current user:", error);
+        }
+    };
+
     useEffect(() => {
-        loadProfile();
-    }, []);
+        setLoading(true);
+        loadProfileData();
+        loadCurrentUser();
+    }, [id]);
+
+    const handleFollowToggle = async () => {
+        if (!profile) return;
+        try {
+            if (profile.is_following) {
+                // Unfollow
+                await api.delete(`/users/follow/${id}`);
+                setProfile(prev => ({
+                    ...prev,
+                    is_following: false,
+                    followers_count: Math.max(0, prev.followers_count - 1)
+                }));
+            } else {
+                // Follow
+                await api.post(`/users/follow/${id}`);
+                setProfile(prev => ({
+                    ...prev,
+                    is_following: true,
+                    followers_count: prev.followers_count + 1
+                }));
+            }
+        } catch (error) {
+            console.error("Error toggle follow:", error);
+            alert("Failed to update follow status.");
+        }
+    };
 
     const handleLike = async (ideaId, e) => {
         e.preventDefault();
         e.stopPropagation();
         try {
             await api.post(`/ideas/${ideaId}/like`);
-            const ideasResponse = await api.get("/ideas");
-            setIdeas(ideasResponse.data);
+            // Reload ideas to show updated like count
+            const ideasRes = await api.get(`/users/${id}/ideas`);
+            setIdeas(ideasRes.data);
         } catch (error) {
             console.log(error);
             if (error.response?.status === 400) {
@@ -95,25 +124,12 @@ function Profile() {
         try {
             await api.post(`/ideas/${ideaId}/remix`);
             alert("Idea remixed successfully!");
-            const ideasResponse = await api.get("/ideas");
-            setIdeas(ideasResponse.data);
+            // Reload ideas
+            const ideasRes = await api.get(`/users/${id}/ideas`);
+            setIdeas(ideasRes.data);
         } catch (error) {
             console.log(error);
             alert("Failed to remix the idea.");
-        }
-    };
-
-    const handleDelete = async (ideaId, e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (!window.confirm("Are you sure you want to delete this idea?")) return;
-        try {
-            await api.delete(`/ideas/${ideaId}`);
-            alert("Idea deleted successfully!");
-            loadProfile();
-        } catch (error) {
-            console.log(error);
-            alert("Failed to delete the idea.");
         }
     };
 
@@ -138,8 +154,8 @@ function Profile() {
         return (
             <AppLayout>
                 <div className="loading-state">
-                    <h2>Loading profile...</h2>
-                    <p className="muted">Fetching the current account details.</p>
+                    <h2>Loading creator profile...</h2>
+                    <p className="muted">Retrieving bio and public catalog.</p>
                 </div>
             </AppLayout>
         );
@@ -149,12 +165,17 @@ function Profile() {
         return (
             <AppLayout>
                 <div className="card" style={{ padding: 40, textAlign: "center" }}>
-                    <h2>Profile not found</h2>
-                    <p className="muted">Please log in to view your profile.</p>
+                    <h2>Creator not found</h2>
+                    <p className="muted">The requested profile does not exist or may have been deleted.</p>
+                    <Link to="/feed" className="button button--primary" style={{ marginTop: 16 }}>
+                        Back to Feed
+                    </Link>
                 </div>
             </AppLayout>
         );
     }
+
+    const isSelf = currentUser && currentUser.id === profile.id;
 
     return (
         <AppLayout>
@@ -182,7 +203,7 @@ function Profile() {
                         <div className="creator-profile__identity">
                             <div className="creator-profile__username-row">
                                 <h1 className="creator-profile__username">@{profile.username}</h1>
-                                <span className="creator-profile__badge">My Account</span>
+                                <span className="creator-profile__badge">Creator</span>
                             </div>
                             <p className="creator-profile__bio">
                                 {profile.bio || "No bio provided."}
@@ -190,24 +211,35 @@ function Profile() {
                         </div>
 
                         <div className="creator-profile__actions-wrapper">
-                            <Link to="/edit-profile" className="button creator-profile__btn button--primary">
-                                ✏️ Edit Profile
-                            </Link>
-                            <Link to={`/users/${profile.id}/ideas`} className="button creator-profile__btn">
-                                📄 My Ideas
-                            </Link>
+                            {isSelf ? (
+                                <Link to="/edit-profile" className="button creator-profile__btn">
+                                    ✏️ Edit My Profile
+                                </Link>
+                            ) : (
+                                <button
+                                    type="button"
+                                    onClick={handleFollowToggle}
+                                    className={`button creator-profile__btn ${
+                                        profile.is_following 
+                                            ? "creator-profile__btn--unfollow" 
+                                            : "creator-profile__btn--follow button--primary"
+                                    }`}
+                                >
+                                    {profile.is_following ? "🔕 Unfollow" : "🔔 Follow"}
+                                </button>
+                            )}
                         </div>
                     </div>
 
                     <div className="creator-profile__stats">
                         <div className="creator-profile__stat-badge">
-                            👥 <span className="creator-profile__stat-count">{followersCount}</span> Followers
+                            👥 <span className="creator-profile__stat-count">{profile.followers_count}</span> Followers
                         </div>
                         <div className="creator-profile__stat-badge">
-                            👣 <span className="creator-profile__stat-count">{followingCount}</span> Following
+                            👣 <span className="creator-profile__stat-count">{profile.following_count}</span> Following
                         </div>
                         <div className="creator-profile__stat-badge">
-                            💡 <span className="creator-profile__stat-count">{ideas.length}</span> Ideas
+                            💡 <span className="creator-profile__stat-count">{profile.ideas_count}</span> Ideas
                         </div>
                         <span className="creator-profile__meta-date">
                             Member since {profile.created_at ? new Date(profile.created_at).getFullYear() : "—"}
@@ -217,19 +249,16 @@ function Profile() {
 
                 {/* Ideas Section */}
                 <div className="creator-profile__section-header">
-                    <h2 className="creator-profile__section-title">💡 My Catalog</h2>
-                    <span className="badge">{ideas.length} Total {ideas.length === 1 ? "Idea" : "Ideas"}</span>
+                    <h2 className="creator-profile__section-title">💡 Shared Ideas</h2>
+                    <span className="badge">{ideas.length} Public {ideas.length === 1 ? "Idea" : "Ideas"}</span>
                 </div>
 
                 <div className="feed-grid">
                     {ideas.length === 0 ? (
                         <div className="creator-profile__empty-state">
                             <span style={{ fontSize: "2rem" }}>📭</span>
-                            <h3 className="creator-profile__empty-title">You haven't created any ideas yet</h3>
-                            <p className="muted">Start drafting concepts to share with the community!</p>
-                            <Link to="/create" className="button button--primary" style={{ marginTop: 8 }}>
-                                Write an Idea
-                            </Link>
+                            <h3 className="creator-profile__empty-title">No public ideas yet</h3>
+                            <p className="muted">This creator hasn't shared any ideas publicly.</p>
                         </div>
                     ) : (
                         ideas.map((idea) => {
@@ -264,11 +293,6 @@ function Profile() {
                                                 </div>
                                             </div>
                                             <div className="feed-card__header-badges">
-                                                {idea.is_public ? (
-                                                    <span className="badge badge--success">Public</span>
-                                                ) : (
-                                                    <span className="badge badge--muted">Private</span>
-                                                )}
                                                 {idea.parent_idea_id && <span className="badge">Remix</span>}
                                             </div>
                                         </header>
@@ -336,12 +360,14 @@ function Profile() {
 
                                             <button
                                                 type="button"
-                                                onClick={(e) => handleDelete(idea.id, e)}
-                                                className="feed-card__action-btn"
-                                                style={{ marginLeft: "auto", backgroundColor: "#fecaca", color: "#ef4444" }}
-                                                title="Delete Idea"
+                                                onClick={(e) => handleBookmark(idea.id, e)}
+                                                className="feed-card__action-btn feed-card__action-btn--bookmark"
+                                                title="Bookmark Idea"
                                             >
-                                                🗑️ Delete
+                                                <svg className="action-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                                    <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2Z"/>
+                                                </svg>
+                                                <span className="action-label">Save</span>
                                             </button>
                                         </footer>
                                     </article>
@@ -355,4 +381,4 @@ function Profile() {
     );
 }
 
-export default Profile;
+export default PublicProfile;

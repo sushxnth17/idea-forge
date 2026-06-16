@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import api from "../services/api";
 import AppLayout from "../components/AppLayout";
 
@@ -9,6 +9,19 @@ function IdeaDetails() {
 
     const [idea, setIdea] = useState(null);
     const [comment, setComment] = useState("");
+    const [currentUser, setCurrentUser] = useState(null);
+
+    useEffect(() => {
+        async function loadCurrentUser() {
+            try {
+                const response = await api.get("/users/profile");
+                setCurrentUser(response.data);
+            } catch (error) {
+                console.log("Could not load current user:", error);
+            }
+        }
+        loadCurrentUser();
+    }, []);
 
     useEffect(() => {
         let isActive = true;
@@ -171,7 +184,12 @@ function IdeaDetails() {
 
                         <div className="card__meta" style={{marginTop:12}}>
                             <div>
-                                <strong>{idea.user?.username || idea.author || 'Community'}</strong>
+                                <Link 
+                                    to={currentUser && idea.owner_id === currentUser.id ? "/profile" : `/user/${idea.owner_id}`}
+                                    style={{ textDecoration: "underline", color: "inherit" }}
+                                >
+                                    <strong>@{idea.owner?.username || `creator_${idea.owner_id}`}</strong>
+                                </Link>
                                 <div className="muted" style={{fontSize:12}}>{idea.created_at ? new Date(idea.created_at).toLocaleString() : null}</div>
                             </div>
                             <div style={{textAlign:'right'}}>
@@ -223,7 +241,12 @@ function IdeaDetails() {
                         <article key={c.id} className="comment-card">
                             <div className="comment-card__meta">
                                 <div>
-                                    <strong className="comment-card__author">{c.user?.username || 'Anonymous'}</strong>
+                                    <Link 
+                                        to={currentUser && c.user_id === currentUser.id ? "/profile" : `/user/${c.user_id}`}
+                                        style={{ textDecoration: "underline", color: "inherit" }}
+                                    >
+                                        <strong className="comment-card__author">@{c.user?.username || `user_${c.user_id}`}</strong>
+                                    </Link>
                                     <div className="muted" style={{fontSize:12}}>{c.created_at ? new Date(c.created_at).toLocaleString() : null}</div>
                                 </div>
                                 <div className="badge badge--muted">Community</div>
