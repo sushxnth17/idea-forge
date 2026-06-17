@@ -39,6 +39,7 @@ class Idea(Base):
 	created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 	owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 	parent_idea_id = Column(Integer,ForeignKey("ideas.id"),nullable=True)
+	status = Column(String, default="concept", nullable=False)
 	owner = relationship("User", back_populates="ideas")
 	parent_idea = relationship("Idea",remote_side=[id])
 	tags = relationship("Tag", secondary=idea_tags, back_populates="ideas")
