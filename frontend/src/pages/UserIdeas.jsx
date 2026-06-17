@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import AppLayout from "../components/AppLayout";
+import StatusBadge from "../components/StatusBadge";
 
 function UserIdeas() {
     const { userId } = useParams();
@@ -50,7 +51,10 @@ function UserIdeas() {
                             style={{ textDecoration: "none", color: "inherit" }}
                         >
                             <article className="feed-card card card--interactive">
-                                <h2 className="feed-card__title" style={{ marginTop: 0 }}>{idea.title}</h2>
+                                <h2 className="feed-card__title" style={{ marginTop: 0, display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                                    {idea.title}
+                                    <StatusBadge status={idea.status} />
+                                </h2>
                                 <p className="feed-card__description">{idea.description}</p>
 
                                 {idea.tags && idea.tags.length > 0 && (

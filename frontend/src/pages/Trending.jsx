@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
 import AppLayout from "../components/AppLayout";
+import StatusBadge from "../components/StatusBadge";
 
 function Trending() {
     const [ideas, setIdeas] = useState([]);
@@ -48,7 +49,10 @@ function Trending() {
                             <div className="card__body">
                                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',gap:12}}>
                                     <div style={{flex:1}}>
-                                        <h2 className="ranking-card__title">{idea.title}</h2>
+                                        <h2 className="ranking-card__title" style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                                            {idea.title}
+                                            <StatusBadge status={idea.status} />
+                                        </h2>
                                         <p className="ranking-card__description muted">{idea.description}</p>
                                         {idea.tags && idea.tags.length > 0 && (
                                             <div className="details-tags" style={{marginTop:8}} aria-label="Idea tags">

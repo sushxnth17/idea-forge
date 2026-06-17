@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import { Link } from "react-router-dom";
 import AppLayout from "../components/AppLayout";
+import StatusBadge from "../components/StatusBadge";
 import "../styles/feed.css";
 
 const avatarColors = [
@@ -194,7 +195,10 @@ function Feed() {
                                     </header>
 
                                     <Link to={`/ideas/${idea.id}`} className="feed-card__content-link">
-                                        <h2 className="feed-card__title">{idea.title}</h2>
+                                        <h2 className="feed-card__title" style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                                            {idea.title}
+                                            <StatusBadge status={idea.status} />
+                                        </h2>
                                         <p className="feed-card__description">{idea.description}</p>
                                     </Link>
 
