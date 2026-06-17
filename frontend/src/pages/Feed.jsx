@@ -201,7 +201,7 @@ function Feed() {
                                     {tags.length > 0 && (
                                         <div className="feed-card__tags" aria-label="Idea tags">
                                             {tags.map((tag) => (
-                                                <span key={tag.id} className="tag-pill">#{tag.name}</span>
+                                                <Link key={tag.id} to={`/search?tag=${encodeURIComponent(tag.name)}`} className="tag-pill">#{tag.name}</Link>
                                             ))}
                                         </div>
                                     )}

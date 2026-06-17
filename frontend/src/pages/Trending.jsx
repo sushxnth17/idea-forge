@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import api from "../services/api";
 import AppLayout from "../components/AppLayout";
 
@@ -52,7 +53,7 @@ function Trending() {
                                         {idea.tags && idea.tags.length > 0 && (
                                             <div className="details-tags" style={{marginTop:8}} aria-label="Idea tags">
                                                 {idea.tags.slice(0,4).map(t => (
-                                                    <span key={t.id} className="tag-pill">#{t.name}</span>
+                                                    <Link key={t.id} to={`/search?tag=${encodeURIComponent(t.name)}`} className="tag-pill">#{t.name}</Link>
                                                 ))}
                                             </div>
                                         )}

@@ -1,77 +1,83 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
-import Navbar from "../components/Navbar";
+import AppLayout from "../components/AppLayout";
 
 function UserIdeas() {
-
     const { userId } = useParams();
-
     const [ideas, setIdeas] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchIdeas();
     }, []);
 
     async function fetchIdeas() {
-
         try {
-
-            const response = await api.get(
-                `/users/${userId}/ideas`
-            );
-
+            const response = await api.get(`/users/${userId}/ideas`);
             setIdeas(response.data);
-
         } catch(error) {
             console.log(error);
         }
     }
 
+    const handleTagClick = (tagName, e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        navigate(`/search?tag=${encodeURIComponent(tagName)}`);
+    };
+
     return (
-        <>
-            <Navbar />
+        <AppLayout>
+            <section className="page__header">
+                <p className="page__eyebrow">Catalog</p>
+                <h1>User Ideas</h1>
+                <p className="page__lead muted">Browse the public ideas shared by this creator.</p>
+            </section>
 
-            <div
-                style={{
-                    maxWidth:"900px",
-                    margin:"auto",
-                    padding:"20px"
-                }}
-            >
-
-                <h1>📄 User Ideas</h1>
-
-                {ideas.map((idea)=>(
-                    <Link
-                        key={idea.id}
-                        to={`/ideas/${idea.id}`}
-                        style={{
-                            textDecoration:"none",
-                            color:"white"
-                        }}
-                    >
-                        <div
-                            style={{
-                                border:"1px solid #333",
-                                borderRadius:"12px",
-                                padding:"20px",
-                                margin:"15px 0"
-                            }}
+            <div className="feed-grid">
+                {ideas.length === 0 ? (
+                    <div className="card">
+                        <h3>No ideas shared yet</h3>
+                        <p className="muted">This creator has not published any ideas to the public catalog.</p>
+                    </div>
+                ) : (
+                    ideas.map((idea) => (
+                        <Link
+                            key={idea.id}
+                            to={`/ideas/${idea.id}`}
+                            className="feed-card-wrapper"
+                            style={{ textDecoration: "none", color: "inherit" }}
                         >
-                            <h2>{idea.title}</h2>
+                            <article className="feed-card card card--interactive">
+                                <h2 className="feed-card__title" style={{ marginTop: 0 }}>{idea.title}</h2>
+                                <p className="feed-card__description">{idea.description}</p>
 
-                            <p>{idea.description}</p>
+                                {idea.tags && idea.tags.length > 0 && (
+                                    <div className="feed-card__tags" style={{ marginTop: 12 }} aria-label="Idea tags">
+                                        {idea.tags.map((tag) => (
+                                            <span
+                                                key={tag.id}
+                                                className="tag-pill"
+                                                onClick={(e) => handleTagClick(tag.name, e)}
+                                            >
+                                                #{tag.name}
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
 
-                            <p>
-                                ❤️ {idea.likes_count}
-                            </p>
-                        </div>
-                    </Link>
-                ))}
-
+                                <footer className="feed-card__actions" style={{ marginTop: 12, borderTop: "1px solid rgba(0,0,0,0.08)", paddingTop: 8 }} role="group" aria-label="Card actions">
+                                    <div className="feed-card__action-btn" style={{ cursor: "default" }}>
+                                        ❤️ <span className="action-count">{idea.likes_count}</span>
+                                    </div>
+                                </footer>
+                            </article>
+                        </Link>
+                    ))
+                )}
             </div>
-        </>
+        </AppLayout>
     );
 }
 

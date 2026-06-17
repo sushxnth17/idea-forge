@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 from ..auth import get_current_user
 from ..database import get_db
 from ..models import (Idea, User, Tag, Like, Comment,Bookmark,Notification,Follow)
-from ..schemas import (IdeaCreate,IdeaResponse,CommentCreate,CommentResponse, BookmarkResponse)
+from ..schemas import (IdeaCreate,IdeaResponse,CommentCreate,CommentResponse, BookmarkResponse, TagResponse)
 
 
 router = APIRouter()
@@ -24,10 +24,18 @@ def create_idea(
 		owner_id=current_user.id,
 	)
 
-	for tag_name in idea.tags:
+	seen_tags = set()
+	normalized_tag_names = []
+	for t in idea.tags:
+		trimmed = t.strip()
+		if trimmed and trimmed.lower() not in seen_tags:
+			seen_tags.add(trimmed.lower())
+			normalized_tag_names.append(trimmed)
+
+	for tag_name in normalized_tag_names:
 		tag = (
 			db.query(Tag)
-			.filter(Tag.name == tag_name)
+			.filter(func.lower(Tag.name) == func.lower(tag_name))
 			.first()
 		)
 
@@ -106,6 +114,30 @@ def update_idea(
 	idea.title = updated_idea.title
 	idea.description = updated_idea.description
 	idea.is_public = updated_idea.is_public
+
+	# Update tags
+	idea.tags.clear()
+	seen_tags = set()
+	normalized_tag_names = []
+	for t in updated_idea.tags:
+		trimmed = t.strip()
+		if trimmed and trimmed.lower() not in seen_tags:
+			seen_tags.add(trimmed.lower())
+			normalized_tag_names.append(trimmed)
+
+	for tag_name in normalized_tag_names:
+		tag = (
+			db.query(Tag)
+			.filter(func.lower(Tag.name) == func.lower(tag_name))
+			.first()
+		)
+
+		if not tag:
+			tag = Tag(name=tag_name)
+			db.add(tag)
+			db.flush()
+
+		idea.tags.append(tag)
 
 	db.commit()
 	db.refresh(idea)
@@ -464,4 +496,22 @@ def search_ideas(
         .all()
     )
 
+    return ideas
+
+@router.get("/tags", response_model=list[TagResponse])
+def get_tags(db: Session = Depends(get_db)):
+    tags = db.query(Tag).all()
+    return tags
+
+@router.get("/ideas/tag/{tag_name}", response_model=list[IdeaResponse])
+def get_ideas_by_tag(tag_name: str, db: Session = Depends(get_db)):
+    ideas = (
+        db.query(Idea)
+        .join(Idea.tags)
+        .filter(
+            func.lower(Tag.name) == func.lower(tag_name),
+            Idea.is_public == True
+        )
+        .all()
+    )
     return ideas

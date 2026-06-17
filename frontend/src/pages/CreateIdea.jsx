@@ -5,22 +5,29 @@ import AppLayout from "../components/AppLayout";
 function CreateIdea() {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
+    const [tagsInput, setTagsInput] = useState("");
 
     async function handleSubmit(e) {
         e.preventDefault();
 
         try {
+            const tagsArray = tagsInput
+                .split(",")
+                .map((tag) => tag.trim())
+                .filter((tag) => tag !== "");
+
             await api.post("/ideas", {
                 title,
                 description,
                 is_public: true,
-                tags: []
+                tags: tagsArray
             });
 
             alert("Idea created!");
 
             setTitle("");
             setDescription("");
+            setTagsInput("");
 
         } catch(error) {
             console.log(error);
@@ -61,6 +68,20 @@ function CreateIdea() {
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             className="textarea"
+                        />
+                    </div>
+
+                    <div className="form__field">
+                        <label className="form__label" htmlFor="idea-tags">
+                            Tags (comma separated)
+                        </label>
+                        <input
+                            id="idea-tags"
+                            type="text"
+                            placeholder="AI, Startup, Education"
+                            value={tagsInput}
+                            onChange={(e) => setTagsInput(e.target.value)}
+                            className="input"
                         />
                     </div>
 

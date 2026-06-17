@@ -153,9 +153,9 @@ function IdeaDetails() {
 
                     <div className="details-tags" aria-label="Idea tags">
                         {idea.tags.map((tag) => (
-                            <span key={tag.id} className="tag-pill" aria-hidden>
+                            <Link key={tag.id} to={`/search?tag=${encodeURIComponent(tag.name)}`} className="tag-pill">
                                 #{tag.name}
-                            </span>
+                            </Link>
                         ))}
                     </div>
                 </div>

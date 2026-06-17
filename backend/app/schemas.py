@@ -53,6 +53,10 @@ class UserProfileUpdate(BaseModel):
 	profile_picture: str | None = None
 
 
+class TagCreate(BaseModel):
+	name: str
+
+
 class TagResponse(BaseModel):
 	id: int
 	name: str

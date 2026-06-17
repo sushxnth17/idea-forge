@@ -2272,3 +2272,16 @@ a:focus-visible {
     font-size: 0.9rem;
   }
 }
+
+.tag-pill {
+  transition: transform 150ms ease, background-color 150ms ease;
+  cursor: pointer;
+  display: inline-flex;
+}
+.tag-pill:hover {
+  background-color: var(--accent-soft) !important;
+  transform: translate(-1px, -1px);
+}
+.tag-pill:active {
+  transform: translate(1px, 1px);
+}
