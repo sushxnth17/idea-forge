@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import api from "../services/api";
 import AppLayout from "../components/AppLayout";
+import StatusBadge from "../components/StatusBadge";
 
 function IdeaDetails() {
 
@@ -140,7 +141,10 @@ function IdeaDetails() {
             <article className="details-hero">
                 <div className="details-hero__copy">
                     <p className="page__eyebrow">Idea details</p>
-                    <h1 className="details-title">{idea.title}</h1>
+                    <h1 className="details-title" style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+                        {idea.title}
+                        <StatusBadge status={idea.status} />
+                    </h1>
 
                     <div className="details-stats">
                         <div className="meta-row">

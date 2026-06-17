@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
 import AppLayout from "../components/AppLayout";
+import StatusBadge from "../components/StatusBadge";
 
 const quickActions = [
   {
@@ -49,12 +50,21 @@ const featureOverview = [
 function Dashboard() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [topIdeaStatus, setTopIdeaStatus] = useState(null);
 
   useEffect(() => {
     async function fetchStats() {
       try {
         const response = await api.get("/users/dashboard/stats");
         setStats(response.data);
+        if (response.data?.most_popular_idea?.id) {
+          try {
+            const detailResponse = await api.get(`/public/ideas/${response.data.most_popular_idea.id}`);
+            setTopIdeaStatus(detailResponse.data.status);
+          } catch (err) {
+            console.error("Error fetching popular idea details:", err);
+          }
+        }
       } catch (error) {
         console.error("Error fetching dashboard stats:", error);
       } finally {
@@ -200,9 +210,12 @@ function Dashboard() {
                   <h3>Top Performing Idea</h3>
                   {stats.most_popular_idea ? (
                     <div style={{ marginTop: 12, display: "grid", gap: 8 }}>
-                      <Link to={`/ideas/${stats.most_popular_idea.id}`} style={{ textDecoration: "underline", fontWeight: "bold" }}>
-                        {stats.most_popular_idea.title}
-                      </Link>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                        <Link to={`/ideas/${stats.most_popular_idea.id}`} style={{ textDecoration: "underline", fontWeight: "bold" }}>
+                          {stats.most_popular_idea.title}
+                        </Link>
+                        {topIdeaStatus && <StatusBadge status={topIdeaStatus} />}
+                      </div>
                       <span className="badge" style={{ width: "fit-content" }}>
                         ❤️ {stats.most_popular_idea.likes} {stats.most_popular_idea.likes === 1 ? "Like" : "Likes"}
                       </span>

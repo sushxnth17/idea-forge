@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, EmailStr
 
@@ -83,6 +84,7 @@ class IdeaCreate(BaseModel):
 	description: str
 	is_public: bool = False
 	tags: list[str] = []
+	status: Literal["concept", "building", "launched", "growing", "archived"] = "concept"
 
 
 class IdeaResponse(BaseModel):
@@ -91,6 +93,7 @@ class IdeaResponse(BaseModel):
 	description: str
 	is_public: bool
 	tags: list[TagResponse]
+	status: str
 	likes_count: int = 0
 	comments: list[CommentResponse] = []
 	parent_idea_id: int | None = None

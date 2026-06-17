@@ -22,6 +22,7 @@ def create_idea(
 		description=idea.description,
 		is_public=idea.is_public,
 		owner_id=current_user.id,
+		status=idea.status,
 	)
 
 	seen_tags = set()
@@ -114,6 +115,7 @@ def update_idea(
 	idea.title = updated_idea.title
 	idea.description = updated_idea.description
 	idea.is_public = updated_idea.is_public
+	idea.status = updated_idea.status
 
 	# Update tags
 	idea.tags.clear()

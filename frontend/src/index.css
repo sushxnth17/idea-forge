@@ -2285,3 +2285,19 @@ a:focus-visible {
 .tag-pill:active {
   transform: translate(1px, 1px);
 }
+
+.status-badge--concept {
+  background-color: #fef08a !important;
+}
+.status-badge--building {
+  background-color: #bfdbfe !important;
+}
+.status-badge--launched {
+  background-color: #bbf7d0 !important;
+}
+.status-badge--growing {
+  background-color: #e9d5ff !important;
+}
+.status-badge--archived {
+  background-color: #e5e7eb !important;
+}
