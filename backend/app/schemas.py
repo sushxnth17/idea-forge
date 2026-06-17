@@ -28,7 +28,20 @@ class IdeaOwnerResponse(BaseModel):
 
 	model_config = ConfigDict(from_attributes=True)
 
+class FeedIdeaResponse(BaseModel):
+    id: int
+    title: str
+    description: str
+    is_public: bool
+    status: str
+    likes_count: int = 0
+    created_at: datetime
+    owner_id: int
+    owner: IdeaOwnerResponse | None = None
 
+    model_config = ConfigDict(from_attributes=True)
+
+	
 class CommentUserResponse(BaseModel):
 	id: int
 	username: str

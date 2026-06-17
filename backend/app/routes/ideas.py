@@ -4,7 +4,7 @@ from sqlalchemy import or_, func
 from ..auth import get_current_user
 from ..database import get_db
 from ..models import (Idea, User, Tag, Like, Comment,Bookmark,Notification,Follow)
-from ..schemas import (IdeaCreate,IdeaResponse,CommentCreate,CommentResponse, BookmarkResponse, TagResponse)
+from ..schemas import (IdeaCreate,IdeaResponse,CommentCreate,CommentResponse, BookmarkResponse, TagResponse, FeedIdeaResponse)
 
 
 router = APIRouter()
@@ -170,7 +170,7 @@ def delete_idea(
 	db.delete(idea)
 	db.commit()
 
-@router.get("/feed", response_model=list[IdeaResponse])
+@router.get("/feed", response_model=list[FeedIdeaResponse])
 def get_public_feed(
 	page: int = 1,
 	limit: int = 5,
