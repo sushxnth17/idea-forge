@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from ..database import get_db
-from ..models import User, Notification, Follow,Idea
-from ..schemas import (UserCreate,UserResponse,UserLogin,Token,UserProfileUpdate,NotificationResponse,FollowResponse,IdeaResponse,UserSearchResponse,PublicUserProfileResponse)
+from ..models import User, Notification, Follow, Idea, Like, Comment, Bookmark
+from ..schemas import (UserCreate,UserResponse,UserLogin,Token,UserProfileUpdate,NotificationResponse,FollowResponse,IdeaResponse,UserSearchResponse,PublicUserProfileResponse,DashboardStatsResponse)
 from ..utils import hash_password, verify_password
 from ..auth import create_access_token, get_current_user
 
@@ -80,6 +81,73 @@ def get_profile(
 	current_user: User = Depends(get_current_user),
 ):
 	return current_user
+
+
+@router.get("/dashboard/stats", response_model=DashboardStatsResponse)
+def get_dashboard_stats(
+	current_user: User = Depends(get_current_user),
+	db: Session = Depends(get_db),
+):
+	# 1. ideas_posted
+	ideas_posted = db.query(Idea).filter(Idea.owner_id == current_user.id).count()
+
+	# 2. total_likes_received
+	total_likes_received = (
+		db.query(func.count(Like.id))
+		.join(Idea, Like.idea_id == Idea.id)
+		.filter(Idea.owner_id == current_user.id)
+		.scalar() or 0
+	)
+
+	# 3. total_comments_received
+	total_comments_received = (
+		db.query(func.count(Comment.id))
+		.join(Idea, Comment.idea_id == Idea.id)
+		.filter(Idea.owner_id == current_user.id)
+		.scalar() or 0
+	)
+
+	# 4. followers_count
+	followers_count = db.query(Follow).filter(Follow.following_id == current_user.id).count()
+
+	# 5. following_count
+	following_count = db.query(Follow).filter(Follow.follower_id == current_user.id).count()
+
+	# 6. bookmarks_received
+	bookmarks_received = (
+		db.query(func.count(Bookmark.id))
+		.join(Idea, Bookmark.idea_id == Idea.id)
+		.filter(Idea.owner_id == current_user.id)
+		.scalar() or 0
+	)
+
+	# 7. most_popular_idea
+	popular_idea_query = (
+		db.query(Idea.id, Idea.title, func.count(Like.id).label("likes_count"))
+		.outerjoin(Like, Idea.id == Like.idea_id)
+		.filter(Idea.owner_id == current_user.id)
+		.group_by(Idea.id)
+		.order_by(func.count(Like.id).desc(), Idea.id.desc())
+		.first()
+	)
+
+	most_popular_idea = None
+	if popular_idea_query:
+		most_popular_idea = {
+			"id": popular_idea_query.id,
+			"title": popular_idea_query.title,
+			"likes": popular_idea_query.likes_count
+		}
+
+	return {
+		"ideas_posted": ideas_posted,
+		"total_likes_received": total_likes_received,
+		"total_comments_received": total_comments_received,
+		"followers_count": followers_count,
+		"following_count": following_count,
+		"bookmarks_received": bookmarks_received,
+		"most_popular_idea": most_popular_idea
+	}
 
 
 @router.put("/profile", response_model=UserResponse)
