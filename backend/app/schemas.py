@@ -144,3 +144,23 @@ class PublicUserProfileResponse(BaseModel):
 	is_following: bool
 
 	model_config = ConfigDict(from_attributes=True)
+
+
+class PopularIdeaResponse(BaseModel):
+	id: int
+	title: str
+	likes: int
+
+	model_config = ConfigDict(from_attributes=True)
+
+
+class DashboardStatsResponse(BaseModel):
+	ideas_posted: int
+	total_likes_received: int
+	total_comments_received: int
+	followers_count: int
+	following_count: int
+	bookmarks_received: int
+	most_popular_idea: PopularIdeaResponse | None = None
+
+	model_config = ConfigDict(from_attributes=True)
