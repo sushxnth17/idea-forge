@@ -6,6 +6,7 @@ function CreateIdea() {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [tagsInput, setTagsInput] = useState("");
+    const [status, setStatus] = useState("concept");
 
     async function handleSubmit(e) {
         e.preventDefault();
@@ -20,7 +21,8 @@ function CreateIdea() {
                 title,
                 description,
                 is_public: true,
-                tags: tagsArray
+                tags: tagsArray,
+                status: status
             });
 
             alert("Idea created!");
@@ -28,6 +30,7 @@ function CreateIdea() {
             setTitle("");
             setDescription("");
             setTagsInput("");
+            setStatus("concept");
 
         } catch(error) {
             console.log(error);
@@ -83,6 +86,25 @@ function CreateIdea() {
                             onChange={(e) => setTagsInput(e.target.value)}
                             className="input"
                         />
+                    </div>
+
+                    <div className="form__field">
+                        <label className="form__label" htmlFor="idea-status">
+                            Status
+                        </label>
+                        <select
+                            id="idea-status"
+                            value={status}
+                            onChange={(e) => setStatus(e.target.value)}
+                            className="input"
+                            style={{ background: "#ffffff", cursor: "pointer" }}
+                        >
+                            <option value="concept">💡 Concept</option>
+                            <option value="building">🛠 Building</option>
+                            <option value="launched">🚀 Launched</option>
+                            <option value="growing">📈 Growing</option>
+                            <option value="archived">📦 Archived</option>
+                        </select>
                     </div>
 
                     <button type="submit" className="button button--primary">
