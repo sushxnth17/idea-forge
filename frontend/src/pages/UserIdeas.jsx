@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import AppLayout from "../components/AppLayout";
 import StatusBadge from "../components/StatusBadge";
+import EmptyState from "../components/EmptyState";
 
 function UserIdeas() {
     const { userId } = useParams();
@@ -38,10 +39,11 @@ function UserIdeas() {
 
             <div className="feed-grid">
                 {ideas.length === 0 ? (
-                    <div className="card">
-                        <h3>No ideas shared yet</h3>
-                        <p className="muted">This creator has not published any ideas to the public catalog.</p>
-                    </div>
+                    <EmptyState
+                        icon="🚀"
+                        title="No ideas published yet."
+                        description="Start building and sharing your first idea."
+                    />
                 ) : (
                     ideas.map((idea) => (
                         <Link

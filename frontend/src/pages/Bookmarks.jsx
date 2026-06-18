@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
 import AppLayout from "../components/AppLayout";
+import EmptyState from "../components/EmptyState";
 
 function Bookmarks() {
 
@@ -38,12 +39,11 @@ function Bookmarks() {
             </section>
 
             {ideas.length === 0 ? (
-                <div className="card">
-                    <h3>No bookmarks yet</h3>
-                    <p className="muted">
-                        Bookmark ideas from the feed to see them here.
-                    </p>
-                </div>
+                <EmptyState
+                    icon="🔖"
+                    title="No bookmarks yet."
+                    description="Save ideas you want to revisit later."
+                />
             ) : (
                 <div className="ideas-grid">
 

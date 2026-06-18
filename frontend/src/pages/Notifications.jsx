@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import AppLayout from "../components/AppLayout";
+import EmptyState from "../components/EmptyState";
 import "../styles/notifications.css";
 
 function Notifications() {
@@ -197,13 +198,11 @@ function Notifications() {
                 {/* List container */}
                 <div className="notifications-list">
                     {filteredNotifications.length === 0 ? (
-                        <div className="notifications-empty">
-                            <span style={{ fontSize: "2rem" }}>📭</span>
-                            <h3 style={{ margin: 0, fontWeight: 900 }}>No notifications</h3>
-                            <p className="muted" style={{ margin: 0 }}>
-                                You are all caught up in this tab category.
-                            </p>
-                        </div>
+                        <EmptyState
+                            icon="🔔"
+                            title="No notifications."
+                            description="You're all caught up."
+                        />
                     ) : (
                         filteredNotifications.map((notification) => {
                             const category = getNotificationCategory(notification.message);
