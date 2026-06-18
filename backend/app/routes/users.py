@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import func
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload, selectinload
 from fastapi.security import OAuth2PasswordRequestForm
 from ..database import get_db
 from ..models import User, Notification, Follow, Idea, Like, Comment, Bookmark
@@ -170,8 +170,10 @@ def search_users(
 	current_user: User = Depends(get_current_user),
 	db: Session = Depends(get_db),
 ):
+	# [EAGER LOADING] Eagerly load followers list to count them in memory without N+1 query overhead
 	users = (
 		db.query(User)
+		.options(selectinload(User.followers))
 		.filter(User.username.ilike(f"%{query}%"))
 		.all()
 	)
@@ -320,8 +322,15 @@ def get_user_ideas(
     db: Session = Depends(get_db)
 ):
 
+    # [EAGER LOADING] Eagerly load owner, tags, likes, and comments for user ideas request
     ideas = (
         db.query(Idea)
+        .options(
+            joinedload(Idea.owner),
+            selectinload(Idea.tags),
+            selectinload(Idea.likes),
+            selectinload(Idea.comments).joinedload(Comment.user)
+        )
         .filter(
             Idea.owner_id == user_id,
             Idea.is_public == True

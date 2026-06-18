@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload, selectinload
 from sqlalchemy import or_, func
 from ..auth import get_current_user
 from ..database import get_db
@@ -58,8 +58,15 @@ def get_ideas(
 	current_user: User = Depends(get_current_user),
 	db: Session = Depends(get_db),
 ):
+	# [EAGER LOADING] Added joinedload/selectinload to load owner, tags, likes, and comments with users in bulk
 	ideas = (
 		db.query(Idea)
+		.options(
+			joinedload(Idea.owner),
+			selectinload(Idea.tags),
+			selectinload(Idea.likes),
+			selectinload(Idea.comments).joinedload(Comment.user)
+		)
 		.filter(Idea.owner_id == current_user.id)
 		.order_by(Idea.created_at.desc())
 		.all()
@@ -73,8 +80,15 @@ def get_single_idea(
 	current_user: User = Depends(get_current_user),
 	db: Session = Depends(get_db),
 ):
+	# [EAGER LOADING] Eagerly load all relationships for single idea lookup to avoid lazy loading queries
 	idea = (
 		db.query(Idea)
+		.options(
+			joinedload(Idea.owner),
+			selectinload(Idea.tags),
+			selectinload(Idea.likes),
+			selectinload(Idea.comments).joinedload(Comment.user)
+		)
 		.filter(
 			Idea.id == idea_id,
 			Idea.owner_id == current_user.id,
@@ -178,8 +192,15 @@ def get_public_feed(
 ):
 	skip = (page - 1) * limit
 
+	# [EAGER LOADING] Eagerly load relationships to resolve N+1 queries when loading the public feed list
 	public_ideas = (
 		db.query(Idea)
+		.options(
+			joinedload(Idea.owner),
+			selectinload(Idea.tags),
+			selectinload(Idea.likes),
+			selectinload(Idea.comments).joinedload(Comment.user)
+		)
 		.filter(Idea.is_public == True)
 		.order_by(Idea.created_at.desc())
 		.offset(skip)
@@ -194,8 +215,15 @@ def search_by_tag(
 	tag_name: str,
 	db: Session = Depends(get_db),
 ):
+	# [EAGER LOADING] Eagerly load relationships to optimize search by tag results
 	ideas = (
 		db.query(Idea)
+		.options(
+			joinedload(Idea.owner),
+			selectinload(Idea.tags),
+			selectinload(Idea.likes),
+			selectinload(Idea.comments).joinedload(Comment.user)
+		)
 		.join(Idea.tags)
 		.filter(
 			Tag.name.ilike(tag_name),
@@ -389,8 +417,15 @@ def get_bookmarks(
 	current_user: User = Depends(get_current_user),
 	db: Session = Depends(get_db),
 ):
+	# [EAGER LOADING] Load owner, tags, likes, and comments for bookmarked ideas list
 	bookmarks = (
 		db.query(Idea)
+		.options(
+			joinedload(Idea.owner),
+			selectinload(Idea.tags),
+			selectinload(Idea.likes),
+			selectinload(Idea.comments).joinedload(Comment.user)
+		)
 		.join(Bookmark)
 		.filter(
 			Bookmark.user_id == current_user.id
@@ -416,8 +451,15 @@ def get_following_feed(
 		)
 	)
 
+	# [EAGER LOADING] Eagerly load relationships to build following feed with minimum queries
 	ideas = (
 		db.query(Idea)
+		.options(
+			joinedload(Idea.owner),
+			selectinload(Idea.tags),
+			selectinload(Idea.likes),
+			selectinload(Idea.comments).joinedload(Comment.user)
+		)
 		.filter(
 			Idea.owner_id.in_(followed_users),
 			Idea.is_public == True
@@ -435,8 +477,15 @@ def get_following_feed(
 def get_trending_ideas(
 	db: Session = Depends(get_db),
 ):
+	# [EAGER LOADING] Eagerly load owner, tags, likes, and comments to prevent N+1 query loops when calculating trending scores
 	ideas = (
 		db.query(Idea)
+		.options(
+			joinedload(Idea.owner),
+			selectinload(Idea.tags),
+			selectinload(Idea.likes),
+			selectinload(Idea.comments).joinedload(Comment.user)
+		)
 		.filter(Idea.is_public == True)
 		.all()
 	)
@@ -461,8 +510,15 @@ def get_public_idea(
     db: Session = Depends(get_db),
 ):
 
+	# [EAGER LOADING] Eagerly load all relationships for public single idea query
     idea = (
         db.query(Idea)
+        .options(
+            joinedload(Idea.owner),
+            selectinload(Idea.tags),
+            selectinload(Idea.likes),
+            selectinload(Idea.comments).joinedload(Comment.user)
+        )
         .filter(
             Idea.id == idea_id,
             Idea.is_public == True
@@ -476,7 +532,7 @@ def get_public_idea(
             detail="Idea not found"
         )
 	
-    db.refresh(idea)
+    # db.refresh(idea) is removed as it wipes the eagerly loaded cache
 
     return idea
 
@@ -486,8 +542,15 @@ def search_ideas(
     db: Session = Depends(get_db)
 ):
 
+	# [EAGER LOADING] Load owner, tags, likes, and comments for general query search results
     ideas = (
         db.query(Idea)
+        .options(
+            joinedload(Idea.owner),
+            selectinload(Idea.tags),
+            selectinload(Idea.likes),
+            selectinload(Idea.comments).joinedload(Comment.user)
+        )
         .filter(
             Idea.is_public == True,
             or_(
@@ -507,8 +570,15 @@ def get_tags(db: Session = Depends(get_db)):
 
 @router.get("/ideas/tag/{tag_name}", response_model=list[IdeaResponse])
 def get_ideas_by_tag(tag_name: str, db: Session = Depends(get_db)):
+	# [EAGER LOADING] Load owner, tags, likes, and comments for tag discovery query results
     ideas = (
         db.query(Idea)
+        .options(
+            joinedload(Idea.owner),
+            selectinload(Idea.tags),
+            selectinload(Idea.likes),
+            selectinload(Idea.comments).joinedload(Comment.user)
+        )
         .join(Idea.tags)
         .filter(
             func.lower(Tag.name) == func.lower(tag_name),
