@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import AppLayout from "../components/AppLayout";
 import { Link } from "react-router-dom";
+import SkeletonCard from "../components/SkeletonCard";
 import "../styles/profile.css";
 import "../styles/feed.css";
 
@@ -137,9 +138,15 @@ function Profile() {
     if (loading) {
         return (
             <AppLayout>
-                <div className="loading-state">
-                    <h2>Loading profile...</h2>
-                    <p className="muted">Fetching the current account details.</p>
+                <div className="creator-profile">
+                    <SkeletonCard type="profile" />
+                    <div className="creator-profile__section-header" style={{ marginTop: 24 }}>
+                        <h2 className="creator-profile__section-title">💡 My Catalog</h2>
+                    </div>
+                    <div className="feed-grid">
+                        <SkeletonCard type="feed" />
+                        <SkeletonCard type="feed" />
+                    </div>
                 </div>
             </AppLayout>
         );

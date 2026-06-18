@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import api from "../services/api";
 import AppLayout from "../components/AppLayout";
+import EmptyState from "../components/EmptyState";
+import SkeletonCard from "../components/SkeletonCard";
 
 const avatarColors = [
     "#6d7cff", // Accent blue
@@ -214,19 +216,21 @@ function Search() {
                     </div>
 
                     {tagLoading && (
-                        <div className="loading-state card">
-                            <h3>Searching ideas...</h3>
-                            <p className="muted">Retrieving ideas matching "#{tagParam}".</p>
+                        <div className="feed-grid">
+                            <SkeletonCard type="feed" />
+                            <SkeletonCard type="feed" />
+                            <SkeletonCard type="feed" />
                         </div>
                     )}
 
                     {!tagLoading && (
                         <div className="feed-grid">
                             {tagResults.length === 0 ? (
-                                <div className="card">
-                                    <h3>No ideas found</h3>
-                                    <p className="muted">We couldn't find any public ideas tagged with <strong>"#{tagParam}"</strong>.</p>
-                                </div>
+                                <EmptyState
+                                    icon="🔍"
+                                    title="No matching ideas found."
+                                    description="Try a different keyword or tag."
+                                />
                             ) : (
                                 tagResults.map((idea) => {
                                     const tags = Array.isArray(idea.tags) ? idea.tags : [];
@@ -390,9 +394,10 @@ function Search() {
                     </div>
 
                     {loading && (
-                        <div className="loading-state card">
-                            <h3>Searching...</h3>
-                            <p className="muted">Retrieving creator records matching "{query}".</p>
+                        <div className="section-grid">
+                            <SkeletonCard type="bookmark" />
+                            <SkeletonCard type="bookmark" />
+                            <SkeletonCard type="bookmark" />
                         </div>
                     )}
 
@@ -400,12 +405,13 @@ function Search() {
                         <div className="section-grid">
                             {results.length === 0 ? (
                                 query ? (
-                                    <div className="card">
-                                        <h3>No creators found</h3>
-                                        <p className="muted">We couldn't find any creators matching <strong>"{query}"</strong>. Try a different username.</p>
-                                    </div>
+                                    <EmptyState
+                                        icon="🔍"
+                                        title="No matching creators found."
+                                        description="Try a different username."
+                                    />
                                 ) : (
-                                    <div className="card">
+                                    <div className="card" style={{ width: "100%", textAlign: "center", padding: "40px" }}>
                                         <h3>Start exploring</h3>
                                         <p className="muted">Type a username in the search field above to discover builders and creators.</p>
                                     </div>

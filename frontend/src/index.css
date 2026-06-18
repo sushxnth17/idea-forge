@@ -2301,3 +2301,76 @@ a:focus-visible {
 .status-badge--archived {
   background-color: #e5e7eb !important;
 }
+
+/* Neo-Brutalist Skeleton Loader Styles */
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #faf5ff 25%, #e9d5ff 37%, #faf5ff 63%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite linear;
+}
+
+.skeleton-card {
+  border: 3px solid #000000 !important;
+  border-radius: 16px !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
+  padding: 24px;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.skeleton-card--profile {
+  background: #e9d5ff !important;
+}
+
+.skeleton-element {
+  border: 2px solid #000000 !important;
+  border-radius: 8px !important;
+}
+
+.skeleton-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px !important;
+  flex-shrink: 0;
+}
+
+.skeleton-avatar--profile {
+  width: 96px;
+  height: 96px;
+  border-radius: 26px !important;
+}
+
+.skeleton-title {
+  height: 24px;
+  width: 60%;
+}
+
+.skeleton-line {
+  height: 16px;
+  width: 100%;
+}
+
+.skeleton-badge {
+  height: 28px;
+  width: 80px;
+  border-radius: 999px !important;
+}
+
+.skeleton-btn {
+  height: 40px;
+  width: 100px;
+  border-radius: 16px !important;
+}

@@ -2,27 +2,29 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
 import AppLayout from "../components/AppLayout";
+import EmptyState from "../components/EmptyState";
+import SkeletonCard from "../components/SkeletonCard";
 
 function Bookmarks() {
 
     const [ideas, setIdeas] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         fetchBookmarks();
     }, []);
 
     async function fetchBookmarks() {
-
+        setLoading(true);
         try {
-
             const response = await api.get(
                 "/bookmarks"
             );
-
             setIdeas(response.data);
-
         } catch(error) {
             console.log(error);
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -37,13 +39,18 @@ function Bookmarks() {
                 </p>
             </section>
 
-            {ideas.length === 0 ? (
-                <div className="card">
-                    <h3>No bookmarks yet</h3>
-                    <p className="muted">
-                        Bookmark ideas from the feed to see them here.
-                    </p>
+            {loading ? (
+                <div className="ideas-grid">
+                    <SkeletonCard type="bookmark" />
+                    <SkeletonCard type="bookmark" />
+                    <SkeletonCard type="bookmark" />
                 </div>
+            ) : ideas.length === 0 ? (
+                <EmptyState
+                    icon="🔖"
+                    title="No bookmarks yet."
+                    description="Save ideas you want to revisit later."
+                />
             ) : (
                 <div className="ideas-grid">
 

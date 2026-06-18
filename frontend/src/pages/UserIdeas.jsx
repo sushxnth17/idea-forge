@@ -3,10 +3,13 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import AppLayout from "../components/AppLayout";
 import StatusBadge from "../components/StatusBadge";
+import EmptyState from "../components/EmptyState";
+import SkeletonCard from "../components/SkeletonCard";
 
 function UserIdeas() {
     const { userId } = useParams();
     const [ideas, setIdeas] = useState([]);
+    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -14,11 +17,14 @@ function UserIdeas() {
     }, []);
 
     async function fetchIdeas() {
+        setLoading(true);
         try {
             const response = await api.get(`/users/${userId}/ideas`);
             setIdeas(response.data);
         } catch(error) {
             console.log(error);
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -37,11 +43,18 @@ function UserIdeas() {
             </section>
 
             <div className="feed-grid">
-                {ideas.length === 0 ? (
-                    <div className="card">
-                        <h3>No ideas shared yet</h3>
-                        <p className="muted">This creator has not published any ideas to the public catalog.</p>
-                    </div>
+                {loading ? (
+                    <>
+                        <SkeletonCard type="feed" />
+                        <SkeletonCard type="feed" />
+                        <SkeletonCard type="feed" />
+                    </>
+                ) : ideas.length === 0 ? (
+                    <EmptyState
+                        icon="🚀"
+                        title="No ideas published yet."
+                        description="Start building and sharing your first idea."
+                    />
                 ) : (
                     ideas.map((idea) => (
                         <Link
