@@ -4,6 +4,7 @@ import api from "../services/api";
 import AppLayout from "../components/AppLayout";
 import StatusBadge from "../components/StatusBadge";
 import RemixLineage from "../components/RemixLineage";
+import RemixTree from "../components/RemixTree";
 
 function IdeaDetails() {
 
@@ -223,6 +224,10 @@ function IdeaDetails() {
                     </div>
                 </aside>
             </article>
+
+            <section className="details-remix-tree" style={{ marginTop: 24 }}>
+                <RemixTree ideaId={idea.id} />
+            </section>
 
             <section className="details-comments">
                 <div className="card">
