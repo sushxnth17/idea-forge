@@ -29,12 +29,13 @@ function PublicProfile() {
 
     const loadProfileData = async () => {
         try {
-            // Load public profile details
-            const profileRes = await api.get(`/users/${id}`);
+            // [PARALLELIZED] Public profile and user public ideas are loaded concurrently.
+            // Both endpoints are independent and only require the profile ID from the URL parameters.
+            const [profileRes, ideasRes] = await Promise.all([
+                api.get(`/users/${id}`),
+                api.get(`/users/${id}/ideas`)
+            ]);
             setProfile(profileRes.data);
-
-            // Load user's public ideas
-            const ideasRes = await api.get(`/users/${id}/ideas`);
             setIdeas(ideasRes.data);
         } catch (error) {
             console.error("Error loading public profile:", error);
