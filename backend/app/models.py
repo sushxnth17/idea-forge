@@ -35,10 +35,10 @@ class Idea(Base):
 	id = Column(Integer, primary_key=True, index=True)
 	title = Column(String, nullable=False)
 	description = Column(Text, nullable=False)
-	is_public = Column(Boolean, default=False, nullable=False)
-	created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-	owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-	parent_idea_id = Column(Integer,ForeignKey("ideas.id"),nullable=True)
+	is_public = Column(Boolean, default=False, index=True, nullable=False)
+	created_at = Column(DateTime(timezone=True), server_default=func.now(), index=True, nullable=False)
+	owner_id = Column(Integer, ForeignKey("users.id"), index=True, nullable=False)
+	parent_idea_id = Column(Integer,ForeignKey("ideas.id"),index=True,nullable=True)
 	status = Column(String, default="concept", nullable=False)
 	owner = relationship("User", back_populates="ideas")
 	parent_idea = relationship("Idea",remote_side=[id])
@@ -71,12 +71,14 @@ class Like(Base):
 	user_id = Column(
 		Integer,
 		ForeignKey("users.id"),
+		index=True,
 		nullable=False
 	)
 
 	idea_id = Column(
 		Integer,
 		ForeignKey("ideas.id"),
+		index=True,
 		nullable=False
 	)
 
@@ -106,12 +108,14 @@ class Comment(Base):
 	user_id = Column(
 		Integer,
 		ForeignKey("users.id"),
+		index=True,
 		nullable=False
 	)
 
 	idea_id = Column(
 		Integer,
 		ForeignKey("ideas.id"),
+		index=True,
 		nullable=False
 	)
 
@@ -133,12 +137,14 @@ class Bookmark(Base):
 	user_id = Column(
 		Integer,
 		ForeignKey("users.id"),
+		index=True,
 		nullable=False
 	)
 
 	idea_id = Column(
 		Integer,
 		ForeignKey("ideas.id"),
+		index=True,
 		nullable=False
 	)
 
@@ -181,6 +187,7 @@ class Notification(Base):
 	user_id = Column(
 		Integer,
 		ForeignKey("users.id"),
+		index=True,
 		nullable=False
 	)
 
@@ -201,12 +208,14 @@ class Follow(Base):
 	follower_id = Column(
 		Integer,
 		ForeignKey("users.id"),
+		index=True,
 		nullable=False
 	)
 
 	following_id = Column(
 		Integer,
 		ForeignKey("users.id"),
+		index=True,
 		nullable=False
 	)
 
