@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import api from "../services/api";
 import AppLayout from "../components/AppLayout";
 import StatusBadge from "../components/StatusBadge";
+import RemixLineage from "../components/RemixLineage";
 
 function IdeaDetails() {
 
@@ -201,6 +202,8 @@ function IdeaDetails() {
                             </div>
                         </div>
                     </div>
+
+                    <RemixLineage parentIdeaId={idea.parent_idea_id} currentIdea={idea} />
 
                     <div className="card panel" style={{marginTop:16}}>
                         <h3 style={{marginBottom:8}}>Product details</h3>
