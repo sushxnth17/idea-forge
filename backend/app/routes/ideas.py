@@ -4,7 +4,7 @@ from sqlalchemy import or_, func
 from ..auth import get_current_user
 from ..database import get_db
 from ..models import (Idea, User, Tag, Like, Comment,Bookmark,Notification,Follow)
-from ..schemas import (IdeaCreate,IdeaResponse,CommentCreate,CommentResponse, BookmarkResponse, TagResponse)
+from ..schemas import (IdeaCreate,IdeaResponse,CommentCreate,CommentResponse, BookmarkResponse, TagResponse, IdeaRemixTreeResponse)
 
 
 router = APIRouter()
@@ -517,3 +517,48 @@ def get_ideas_by_tag(tag_name: str, db: Session = Depends(get_db)):
         .all()
     )
     return ideas
+
+@router.get("/ideas/{idea_id}/remix-tree", response_model=IdeaRemixTreeResponse)
+def get_idea_remix_tree(
+	idea_id: int,
+	db: Session = Depends(get_db),
+):
+	root_idea = (
+		db.query(Idea)
+		.filter(Idea.id == idea_id, Idea.is_public == True)
+		.first()
+	)
+
+	if root_idea is None:
+		raise HTTPException(
+			status_code=status.HTTP_404_NOT_FOUND,
+			detail="Idea not found",
+		)
+
+	visited = set()
+
+	def build_tree(idea: Idea) -> IdeaRemixTreeResponse:
+		visited.add(idea.id)
+		
+		child_ideas = (
+			db.query(Idea)
+			.filter(
+				Idea.parent_idea_id == idea.id,
+				Idea.is_public == True
+			)
+			.order_by(Idea.id.asc())
+			.all()
+		)
+		
+		children_list = []
+		for child in child_ideas:
+			if child.id not in visited:
+				children_list.append(build_tree(child))
+				
+		return IdeaRemixTreeResponse(
+			id=idea.id,
+			title=idea.title,
+			children=children_list
+		)
+
+	return build_tree(root_idea)

@@ -3,6 +3,8 @@ import { useParams, Link } from "react-router-dom";
 import api from "../services/api";
 import AppLayout from "../components/AppLayout";
 import StatusBadge from "../components/StatusBadge";
+import RemixLineage from "../components/RemixLineage";
+import RemixTree from "../components/RemixTree";
 
 function IdeaDetails() {
 
@@ -202,6 +204,8 @@ function IdeaDetails() {
                         </div>
                     </div>
 
+                    <RemixLineage parentIdeaId={idea.parent_idea_id} currentIdea={idea} />
+
                     <div className="card panel" style={{marginTop:16}}>
                         <h3 style={{marginBottom:8}}>Product details</h3>
                         <p className="muted" style={{marginBottom:12}}>A premium layout tailored for showcasing ideas like a product page — clear CTAs, attractive metadata and tags.</p>
@@ -220,6 +224,10 @@ function IdeaDetails() {
                     </div>
                 </aside>
             </article>
+
+            <section className="details-remix-tree" style={{ marginTop: 24 }}>
+                <RemixTree ideaId={idea.id} />
+            </section>
 
             <section className="details-comments">
                 <div className="card">
