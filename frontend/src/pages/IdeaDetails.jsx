@@ -186,6 +186,16 @@ function IdeaDetails() {
                                     ⭐ Bookmark
                                 </button>
                             </div>
+
+                            {currentUser && idea.owner_id === currentUser.id && (
+                                <Link 
+                                    to={`/ideas/${idea.id}/edit`} 
+                                    className="button button--secondary button--full" 
+                                    style={{ marginTop: 12, width: "100%", justifyContent: "center" }}
+                                >
+                                    ✏️ Edit Idea
+                                </Link>
+                            )}
                         </div>
 
                         <div className="card__meta" style={{marginTop:12}}>
