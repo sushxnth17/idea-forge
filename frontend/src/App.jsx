@@ -15,6 +15,7 @@ import UserIdeas from "./pages/UserIdeas";
 import Bookmarks from "./pages/Bookmarks";
 import EditProfile from "./pages/EditProfile";
 import PublicProfile from "./pages/PublicProfile";
+import EditIdea from "./pages/EditIdea";
 
 function App() {
   return (
@@ -96,6 +97,15 @@ function App() {
           element={
             <ProtectedRoute>
               <IdeaDetails />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/ideas/:id/edit"
+          element={
+            <ProtectedRoute>
+              <EditIdea />
             </ProtectedRoute>
           }
         />
