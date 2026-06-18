@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import AppLayout from "../components/AppLayout";
 import StatusBadge from "../components/StatusBadge";
 import EmptyState from "../components/EmptyState";
+import SkeletonCard from "../components/SkeletonCard";
 import "../styles/feed.css";
 
 const avatarColors = [
@@ -21,6 +22,7 @@ function Feed() {
     const [ideas, setIdeas] = useState([]);
     const [currentUser, setCurrentUser] = useState(null);
     const [page, setPage] = useState(1);
+    const [loading, setLoading] = useState(true);
     const limit = 5;
 
     useEffect(() => {
@@ -36,11 +38,14 @@ function Feed() {
     }, []);
 
     const loadIdeas = async () => {
+        setLoading(true);
         try {
             const response = await api.get(`/feed?page=${page}&limit=${limit}`);
             setIdeas(response.data);
         } catch (error) {
             console.log(error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -148,7 +153,13 @@ function Feed() {
                 </section>
 
                 <div className="feed-grid">
-                    {ideas.length === 0 ? (
+                    {loading ? (
+                        <>
+                            <SkeletonCard type="feed" />
+                            <SkeletonCard type="feed" />
+                            <SkeletonCard type="feed" />
+                        </>
+                    ) : ideas.length === 0 ? (
                         <EmptyState 
                             icon="💡" 
                             title="No ideas yet." 

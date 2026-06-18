@@ -4,10 +4,12 @@ import api from "../services/api";
 import AppLayout from "../components/AppLayout";
 import StatusBadge from "../components/StatusBadge";
 import EmptyState from "../components/EmptyState";
+import SkeletonCard from "../components/SkeletonCard";
 
 function UserIdeas() {
     const { userId } = useParams();
     const [ideas, setIdeas] = useState([]);
+    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -15,11 +17,14 @@ function UserIdeas() {
     }, []);
 
     async function fetchIdeas() {
+        setLoading(true);
         try {
             const response = await api.get(`/users/${userId}/ideas`);
             setIdeas(response.data);
         } catch(error) {
             console.log(error);
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -38,7 +43,13 @@ function UserIdeas() {
             </section>
 
             <div className="feed-grid">
-                {ideas.length === 0 ? (
+                {loading ? (
+                    <>
+                        <SkeletonCard type="feed" />
+                        <SkeletonCard type="feed" />
+                        <SkeletonCard type="feed" />
+                    </>
+                ) : ideas.length === 0 ? (
                     <EmptyState
                         icon="🚀"
                         title="No ideas published yet."

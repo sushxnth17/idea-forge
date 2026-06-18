@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import api from "../services/api";
 import AppLayout from "../components/AppLayout";
 import EmptyState from "../components/EmptyState";
+import SkeletonCard from "../components/SkeletonCard";
 
 const avatarColors = [
     "#6d7cff", // Accent blue
@@ -215,9 +216,10 @@ function Search() {
                     </div>
 
                     {tagLoading && (
-                        <div className="loading-state card">
-                            <h3>Searching ideas...</h3>
-                            <p className="muted">Retrieving ideas matching "#{tagParam}".</p>
+                        <div className="feed-grid">
+                            <SkeletonCard type="feed" />
+                            <SkeletonCard type="feed" />
+                            <SkeletonCard type="feed" />
                         </div>
                     )}
 
@@ -392,9 +394,10 @@ function Search() {
                     </div>
 
                     {loading && (
-                        <div className="loading-state card">
-                            <h3>Searching...</h3>
-                            <p className="muted">Retrieving creator records matching "{query}".</p>
+                        <div className="section-grid">
+                            <SkeletonCard type="bookmark" />
+                            <SkeletonCard type="bookmark" />
+                            <SkeletonCard type="bookmark" />
                         </div>
                     )}
 

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import AppLayout from "../components/AppLayout";
 import EmptyState from "../components/EmptyState";
+import SkeletonCard from "../components/SkeletonCard";
 import "../styles/notifications.css";
 
 function Notifications() {
@@ -127,9 +128,20 @@ function Notifications() {
     if (loading) {
         return (
             <AppLayout>
-                <div className="loading-state">
-                    <h2>Loading notifications...</h2>
-                    <p className="muted">Fetching updates from your network.</p>
+                <div className="notifications-shell">
+                    <section className="page__header" style={{ margin: 0, marginBottom: 26 }}>
+                        <p className="page__eyebrow">Inbox</p>
+                        <h1>Notifications</h1>
+                        <p className="page__lead muted">
+                            Track read and unread activity in one place.
+                        </p>
+                    </section>
+                    <div className="notifications-list">
+                        <SkeletonCard type="notification" />
+                        <SkeletonCard type="notification" />
+                        <SkeletonCard type="notification" />
+                        <SkeletonCard type="notification" />
+                    </div>
                 </div>
             </AppLayout>
         );

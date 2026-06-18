@@ -3,27 +3,28 @@ import { Link } from "react-router-dom";
 import api from "../services/api";
 import AppLayout from "../components/AppLayout";
 import EmptyState from "../components/EmptyState";
+import SkeletonCard from "../components/SkeletonCard";
 
 function Bookmarks() {
 
     const [ideas, setIdeas] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         fetchBookmarks();
     }, []);
 
     async function fetchBookmarks() {
-
+        setLoading(true);
         try {
-
             const response = await api.get(
                 "/bookmarks"
             );
-
             setIdeas(response.data);
-
         } catch(error) {
             console.log(error);
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -38,7 +39,13 @@ function Bookmarks() {
                 </p>
             </section>
 
-            {ideas.length === 0 ? (
+            {loading ? (
+                <div className="ideas-grid">
+                    <SkeletonCard type="bookmark" />
+                    <SkeletonCard type="bookmark" />
+                    <SkeletonCard type="bookmark" />
+                </div>
+            ) : ideas.length === 0 ? (
                 <EmptyState
                     icon="🔖"
                     title="No bookmarks yet."
