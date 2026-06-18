@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr,Field
 
 
 class UserCreate(BaseModel):
@@ -167,3 +167,14 @@ class DashboardStatsResponse(BaseModel):
 	most_popular_idea: PopularIdeaResponse | None = None
 
 	model_config = ConfigDict(from_attributes=True)
+
+
+class IdeaRemixTreeResponse(BaseModel):
+	id: int
+	title: str
+	children: list["IdeaRemixTreeResponse"] = Field(default_factory=list)
+
+	model_config = ConfigDict(from_attributes=True)
+
+
+IdeaRemixTreeResponse.model_rebuild()
