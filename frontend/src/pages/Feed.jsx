@@ -184,7 +184,7 @@ function Feed() {
                                         </Link>
 
                                         {/* 2. Actions Second */}
-                                        <div className="feed-card__actions" style={{ borderTop: "2px solid #000000", borderBottom: "2px solid #000000", padding: "10px 0", marginTop: 4, display: "flex", gap: 12, alignItems: "center" }}>
+                                        <div className="feed-card__actions" style={{ borderTop: "1.5px solid #000000", borderBottom: "1.5px solid #000000", padding: "10px 0", marginTop: 4, display: "flex", gap: 12, alignItems: "center" }}>
                                             <button
                                                 type="button"
                                                 onClick={(e) => handleLike(idea.id, e)}
@@ -262,7 +262,7 @@ function Feed() {
                                                 >
                                                     <div 
                                                         className="feed-card__avatar" 
-                                                        style={{ backgroundColor: getAvatarColor(idea.owner_id), width: 32, height: 32, borderRadius: "50%", border: "2px solid #000000", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.75rem", color: "#ffffff", fontWeight: "bold" }}
+                                                        style={{ backgroundColor: getAvatarColor(idea.owner_id), width: 32, height: 32, borderRadius: "50%", border: "1.5px solid #000000", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.75rem", color: "#ffffff", fontWeight: "bold" }}
                                                     >
                                                         {idea.owner?.profile_picture ? (
                                                             <img 

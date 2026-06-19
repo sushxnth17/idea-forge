@@ -6,12 +6,12 @@
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 28px; /* Increased layout spacing */
 }
 
 /* Hero Section */
 .feed-hero {
-  border: 3px solid #000000 !important;
+  border: 2px solid #000000 !important; /* Softened from 3px */
   border-radius: var(--radius-lg) !important;
   background: var(--surface-soft) !important; /* Neutral light gray */
   padding: 24px;
@@ -28,7 +28,7 @@
 .feed-grid {
   display: flex;
   flex-direction: column;
-  gap: 24px; /* consistent spacing */
+  gap: 28px; /* Increased card gaps */
 }
 
 .feed-card-wrapper {
@@ -41,7 +41,7 @@
   gap: 16px;
   padding: 20px;
   border-radius: 16px !important;
-  border: 3px solid #000000 !important; /* Thick black outline */
+  border: 2px solid #000000 !important; /* Softened from 3px */
   background: var(--surface) !important; /* Clean white background */
   box-shadow: none !important; /* Hard shadow */
   transition: transform 150ms ease, box-shadow 150ms ease;
@@ -52,7 +52,7 @@
 
 /* Feed Card Hover translation */
 .feed-card:hover {
-  transform: translate(-3px, -3px) !important;
+  transform: translate(-2px, -2px) !important;
   box-shadow: none !important;
 }
 
@@ -80,7 +80,7 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  border: 2px solid #000000 !important; /* Outline avatar */
+  border: 1.5px solid #000000 !important; /* Softened from 2px */
   font-weight: 800;
   font-size: 0.85rem;
   color: #ffffff;
@@ -172,7 +172,7 @@
   font-size: 0.88rem;
   color: #000000 !important;
   background: #ffffff !important;
-  border: 2px solid #000000 !important;
+  border: 1.5px solid #000000 !important; /* Softened from 2px */
   padding: 8px 12px;
   border-radius: var(--radius-sm);
   width: fit-content;
@@ -204,7 +204,7 @@
   min-height: 38px;
   padding: 6px 14px;
   border-radius: 12px !important;
-  border: 2px solid #000000 !important; /* Thick outline */
+  border: 1.5px solid #000000 !important; /* Softened from 2px */
   background: #ffffff !important; /* Solid fill default */
   color: #000000 !important;
   font-size: 0.85rem;
@@ -271,7 +271,7 @@
   gap: 16px;
   margin-top: 16px;
   padding: 16px;
-  border-top: 3px solid #000000 !important; /* Thick top outline */
+  border-top: 2px solid #000000 !important; /* Softened from 3px */
 }
 
 .feed-pagination__btn {
@@ -283,7 +283,7 @@
   font-size: 0.94rem;
   font-weight: 900;
   color: #000000 !important;
-  border: 2px solid #000000 !important;
+  border: 1.5px solid #000000 !important; /* Softened from 2px */
   background: #ffffff !important;
   padding: 8px 16px;
   border-radius: 12px;
@@ -301,7 +301,7 @@
   gap: 16px;
   height: 100%;
   background: var(--surface) !important; /* Clean white background */
-  border: 3px solid #000000 !important;
+  border: 2px solid #000000 !important; /* Softened from 3px */
   border-radius: 16px !important;
   box-shadow: none !important;
   color: #000000 !important;
@@ -326,7 +326,7 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  border: 2px solid #000000 !important; /* avatar outline */
+  border: 1.5px solid #000000 !important; /* Softened from 2px */
   font-weight: 900;
   font-size: 0.98rem;
   color: #ffffff;
@@ -369,7 +369,7 @@
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-  border-top: 2px solid #000000 !important; /* outlined separator */
+  border-top: 1.5px solid #000000 !important; /* Softened from 2px */
   padding-top: 12px;
   margin-top: auto;
 }

@@ -300,7 +300,7 @@ p {
 .profile-sections,
 .notifications-list {
   display: grid;
-  gap: 18px;
+  gap: 28px; /* Increased whitespace gap */
 }
 
 .section-grid,
@@ -327,13 +327,13 @@ p {
 .comment-card,
 .details-hero,
 .panel {
-  border: 3px solid #000000 !important;
+  border: 2px solid #000000 !important; /* Softened from 3px */
   border-radius: 16px !important;
   background: var(--surface) !important;
   /* Clean white surface */
   box-shadow: none !important;
   color: #000000 !important;
-  padding: 24px;
+  padding: 28px; /* Increased padding */
 }
 
 .panel,
@@ -363,7 +363,7 @@ p {
 .notification-card:hover,
 .profile-card:hover,
 .comment-card:hover {
-  transform: translate(-3px, -3px) !important;
+  transform: translate(-2px, -2px) !important; /* Softened translation */
   box-shadow: none !important;
 }
 
@@ -411,7 +411,7 @@ button,
   align-items: center;
   justify-content: center;
   gap: 8px;
-  border: 3px solid #000000 !important;
+  border: 2px solid #000000 !important; /* Softened from 3px */
   border-radius: 16px !important;
   min-height: 46px;
   padding: 12px 18px;
@@ -429,7 +429,7 @@ button,
 .button:hover,
 button:hover,
 .btn:hover {
-  transform: translate(-2px, -2px) !important;
+  transform: translate(-1.5px, -1.5px) !important; /* Softened hover */
   box-shadow: none !important;
 }
 
@@ -500,7 +500,7 @@ button[type="submit"],
 .search-field {
   width: 100%;
   min-height: 48px;
-  border: 3px solid #000000 !important;
+  border: 2px solid #000000 !important; /* Softened from 3px */
   border-radius: 12px !important;
   background: #ffffff !important;
   /* Solid white */
@@ -570,7 +570,7 @@ button[type="submit"],
   font-size: 0.82rem;
   font-weight: 800;
   letter-spacing: 0.01em;
-  border: 2px solid #000000 !important;
+  border: 1.5px solid #000000 !important; /* Softened from 2px */
   background: #ffffff !important;
   color: #000000 !important;
   box-shadow: none !important;
@@ -1779,7 +1779,7 @@ p,
 .feed-card__rank {
   background: var(--accent);
   color: #000;
-  border: 3px solid #000;
+  border: 2px solid #000;
   box-shadow: none;
 }
 
@@ -1804,7 +1804,7 @@ p,
 }
 
 .app-nav__links {
-  border: 3px solid #000;
+  border: 2px solid #000;
   border-radius: 16px;
   background: var(--surface-soft);
   box-shadow: none;
@@ -1813,7 +1813,7 @@ p,
 }
 
 .app-nav__link {
-  border: 3px solid #000;
+  border: 2px solid #000;
   border-radius: 999px;
   color: #000;
   background: var(--surface);
@@ -1988,7 +1988,7 @@ button:active,
 .input,
 .textarea,
 .search-field {
-  border: 3px solid #000;
+  border: 2px solid #000;
   border-radius: 12px;
   background: #ffffff;
   color: #000;
@@ -2008,7 +2008,7 @@ button:active,
 .tag-pill,
 .notification-card__status span,
 .feed-card__likes span {
-  border: 3px solid #000;
+  border: 1.5px solid #000;
   border-radius: 999px;
   background: var(--surface-soft);
   color: #000;
@@ -2319,7 +2319,7 @@ a:focus-visible {
 }
 
 .skeleton-card {
-  border: 3px solid #000000 !important;
+  border: 2px solid #000000 !important;
   border-radius: 16px !important;
   background: #ffffff !important;
   box-shadow: none !important;
@@ -2336,7 +2336,7 @@ a:focus-visible {
 }
 
 .skeleton-element {
-  border: 2px solid #000000 !important;
+  border: 1.5px solid #000000 !important;
   border-radius: 8px !important;
 }
 
