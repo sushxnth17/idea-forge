@@ -30,22 +30,26 @@ function Profile() {
 
     const loadProfile = async () => {
         try {
-            const response = await api.get("/users/profile");
-            setProfile(response.data);
+            // [PARALLELIZED] Phase 1: Fetch user profile and ideas concurrently.
+            // Both endpoints are independent and do not rely on each other's response.
+            const [profileRes, ideasRes] = await Promise.all([
+                api.get("/users/profile"),
+                api.get("/ideas")
+            ]);
+            
+            const profileData = profileRes.data;
+            setProfile(profileData);
+            setIdeas(ideasRes.data);
 
-            const followersResponse = await api.get(
-                `/users/followers/${response.data.id}`
-            );
+            // [PARALLELIZED] Phase 2: Fetch followers and following list in parallel.
+            // These endpoints depend on the profile ID resolved in Phase 1, but are independent of each other.
+            const [followersRes, followingRes] = await Promise.all([
+                api.get(`/users/followers/${profileData.id}`),
+                api.get(`/users/following/${profileData.id}`)
+            ]);
 
-            const followingResponse = await api.get(
-                `/users/following/${response.data.id}`
-            );
-
-            const ideasResponse = await api.get("/ideas");
-
-            setFollowersCount(followersResponse.data.length);
-            setFollowingCount(followingResponse.data.length);
-            setIdeas(ideasResponse.data);
+            setFollowersCount(followersRes.data.length);
+            setFollowingCount(followingRes.data.length);
         } catch (error) {
             console.log("Error loading profile details:", error);
         } finally {
