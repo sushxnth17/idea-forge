@@ -40,7 +40,7 @@
     bottom: 0;
     width: 240px;
     height: 100vh;
-    background: #f8f5ef !important; /* Warm off-white background */
+    background: #ffffff !important; /* Clean white background */
     border-right: 3px solid #000000 !important; /* Thick black border */
     padding: 28px 16px;
     box-sizing: border-box;
@@ -68,10 +68,10 @@
     display: grid;
     place-items: center;
     border-radius: 12px;
-    background: #ff7a00 !important; /* Orange branding */
+    background: #000000 !important; /* Modern black branding */
     border: 2px solid #000000 !important;
     box-shadow: none !important;
-    color: #000000 !important;
+    color: #ffffff !important; /* White text on black */
     font-size: 1.05rem;
     font-weight: 900;
     flex-shrink: 0;
@@ -140,17 +140,20 @@
   .app-sidebar__link:hover {
     color: #000000 !important;
     border: 3px solid #000000 !important;
-    background: #e9d5ff !important; /* Soft lavender hover */
+    background: var(--surface-soft) !important; /* Light gray neutral hover */
     box-shadow: none !important;
     transform: translate(-2px, -2px);
   }
 
   /* Active Link State */
   .app-sidebar__link--active {
-    color: #000000 !important;
-    background: #ff7a00 !important; /* Solid orange */
+    color: #ffffff !important;
+    background: #000000 !important; /* Solid black active state */
     border: 3px solid #000000 !important;
     box-shadow: none !important;
+  }
+  .app-sidebar__link--active .nav-icon {
+    stroke: #ffffff !important;
   }
 
   .app-sidebar__link--active:hover {
@@ -247,7 +250,7 @@
     left: 0;
     right: 0;
     height: 58px;
-    background: #f8f5ef !important;
+    background: #ffffff !important; /* Clean white background */
     border-bottom: 3px solid #000000 !important;
     padding: 0 16px;
     z-index: 90;
@@ -268,10 +271,10 @@
     display: grid;
     place-items: center;
     border-radius: 8px;
-    background: #ff7a00 !important;
+    background: #000000 !important; /* Clean black branding */
     border: 2px solid #000000 !important;
     box-shadow: none !important;
-    color: #000000 !important;
+    color: #ffffff !important; /* White text on black mark */
     font-size: 0.85rem;
     font-weight: 900;
   }
@@ -314,7 +317,7 @@
     left: 0;
     right: 0;
     height: 66px;
-    background: #f8f5ef !important;
+    background: #ffffff !important; /* Clean white background */
     border-top: 3px solid #000000 !important;
     padding: 0 8px;
     z-index: 90;
@@ -361,14 +364,13 @@
 
   /* Active State for Mobile Bottom Nav */
   .app-mobile-bottom-nav__link--active {
-    color: #000000 !important;
-    background: #ff7a00 !important; /* Active orange accent bg */
+    color: #ffffff !important;
+    background: #000000 !important; /* Active black bg */
     border: 2px solid #000000 !important;
     box-shadow: none !important;
   }
-
   .app-mobile-bottom-nav__link--active .nav-icon {
-    stroke: #000000 !important;
+    stroke: #ffffff !important;
   }
 }
 

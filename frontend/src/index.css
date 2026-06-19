@@ -1,20 +1,20 @@
 :root {
   color-scheme: light;
-  --bg: #f8f5ef;
+  --bg: #fafafa;
   --bg-elevated: #ffffff;
   --surface: #ffffff;
   --surface-strong: #fafafa;
-  --surface-soft: #f3f4f6;
+  --surface-soft: #f4f4f5;
   --text: #1f2937;
   --text-strong: #000000;
   --text-muted: #4b5563;
   --border: #000000;
   --border-strong: #000000;
-  --accent: #ff7a00;
-  --accent-strong: #ea580c;
-  --accent-soft: #e9d5ff;
+  --accent: #ffd000;
+  --accent-strong: #e5b800;
+  --accent-soft: #fffbeb;
   --success: #22c55e;
-  --warning: #facc15;
+  --warning: #ffd000;
   --danger: #ef4444;
   --shadow: none;
   --shadow-soft: none;
@@ -33,7 +33,7 @@
 
 html {
   min-height: 100%;
-  background: #f8f5ef;
+  background: var(--bg);
 }
 
 body {
@@ -43,7 +43,7 @@ body {
   font-size: 16px;
   line-height: 1.62;
   color: #1f2937;
-  background: #f8f5ef;
+  background: var(--bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -329,8 +329,8 @@ p {
 .panel {
   border: 3px solid #000000 !important;
   border-radius: 16px !important;
-  background: #fef9c3 !important;
-  /* Soft yellow default */
+  background: var(--surface) !important;
+  /* Clean white surface */
   box-shadow: none !important;
   color: #000000 !important;
   padding: 24px;
@@ -342,8 +342,8 @@ p {
 .details-hero__panel,
 .dashboard-hero__intro,
 .details-hero__copy {
-  background: #e9d5ff !important;
-  /* Soft lavender background */
+  background: var(--surface-soft) !important;
+  /* Light gray background */
 }
 
 .card--interactive,
@@ -455,15 +455,15 @@ button[type="submit"],
 .cta-link,
 .btn-primary {
   color: #000000 !important;
-  background: #ff7a00 !important;
-  /* Primary orange accent */
+  background: var(--accent) !important;
+  /* Refined yellow accent */
 }
 
 .button--secondary,
 .btn-secondary {
   color: #000000 !important;
-  background: #fef08a !important;
-  /* Secondary soft yellow */
+  background: var(--surface) !important;
+  /* Secondary white background */
 }
 
 .button--ghost {
@@ -516,13 +516,13 @@ button[type="submit"],
 .search-field:focus {
   transform: translate(-1px, -1px);
   box-shadow: none !important;
-  border-color: #ff7a00 !important;
+  border-color: var(--accent) !important;
 }
 
 .input:focus-visible,
 .textarea:focus-visible,
 .search-field:focus-visible {
-  outline: 2px solid #ff7a00 !important;
+  outline: 2px solid var(--accent) !important;
 }
 
 .input::placeholder,
@@ -582,8 +582,8 @@ button[type="submit"],
 }
 
 .badge--warning {
-  background: #fef08a !important;
-  /* Soft yellow */
+  background: var(--accent-soft) !important;
+  /* Soft yellow accent-soft */
 }
 
 .badge--danger {
@@ -2287,7 +2287,7 @@ a:focus-visible {
 }
 
 .status-badge--concept {
-  background-color: #fef08a !important;
+  background-color: var(--accent-soft) !important;
 }
 .status-badge--building {
   background-color: #bfdbfe !important;

@@ -13,7 +13,7 @@
 .creator-profile__card {
   border: 3px solid #000000 !important;
   border-radius: var(--radius-lg) !important;
-  background: #fef9c3 !important; /* Soft Yellow */
+  background: var(--surface) !important; /* Clean white card */
   padding: 30px;
   display: flex;
   flex-direction: column;
@@ -94,7 +94,7 @@
 }
 
 .creator-profile__badge {
-  background: #ff7a00 !important;
+  background: var(--accent) !important; /* Yellow badge */
   color: #000000 !important;
   font-size: 0.78rem;
   font-weight: 800;
@@ -125,7 +125,7 @@
 }
 
 .creator-profile__btn--follow {
-  background: #ff7a00 !important; /* Accent orange */
+  background: var(--accent) !important; /* Accent yellow */
 }
 
 .creator-profile__btn--unfollow {
@@ -157,7 +157,7 @@
 .creator-profile__stat-count {
   font-size: 1rem;
   font-weight: 900;
-  color: #ff7a00;
+  color: var(--text-strong); /* High contrast bold black count */
 }
 
 .creator-profile__meta-date {
@@ -187,7 +187,7 @@
 /* Empty Ideas State */
 .creator-profile__empty-state {
   border: 3px dashed #000000 !important;
-  background: #e9d5ff !important; /* Soft lavender */
+  background: var(--surface-soft) !important; /* Soft light gray */
   border-radius: 16px;
   padding: 40px;
   text-align: center;

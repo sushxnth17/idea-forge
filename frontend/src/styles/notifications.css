@@ -49,7 +49,7 @@
 }
 
 .notifications-tab-btn--active {
-  background: #ff7a00 !important; /* Accent orange */
+  background: var(--accent) !important; /* Accent yellow */
   color: #000000 !important;
 }
 
@@ -84,8 +84,8 @@
 }
 
 .notification-card--unread {
-  background: #fef9c3 !important; /* Soft yellow highlight for unread */
-  border-left: 8px solid #ff7a00 !important; /* Left highlight strip */
+  background: var(--accent-soft) !important; /* Soft yellow highlight for unread */
+  border-left: 8px solid var(--accent) !important; /* Left yellow highlight strip */
 }
 
 /* Left Icon Container */
@@ -115,7 +115,7 @@
 }
 
 .notification-card__icon-wrapper--remix {
-  background: #fef08a !important; /* Soft yellow */
+  background: var(--accent-soft) !important; /* Soft yellow */
 }
 
 /* Middle Content */
@@ -136,7 +136,7 @@
 
 .notification-card__username {
   font-weight: 900;
-  color: #ff7a00;
+  color: var(--text-strong);
 }
 
 .notification-card__date {
@@ -156,7 +156,7 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #ff7a00;
+  background: var(--accent); /* Yellow dot highlight */
   border: 1px solid #000000;
 }
 
@@ -179,7 +179,7 @@
 /* Empty notifications card */
 .notifications-empty {
   border: 3px dashed #000000 !important;
-  background: #e9d5ff !important; /* Soft lavender */
+  background: var(--surface-soft) !important; /* Soft light gray */
   border-radius: 16px;
   padding: 48px;
   text-align: center;

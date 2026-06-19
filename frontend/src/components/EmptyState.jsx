@@ -7,7 +7,7 @@ function EmptyState({ icon, title, description }) {
       style={{ 
         textAlign: "center", 
         padding: "48px 24px", 
-        background: "#fef9c3", 
+        background: "var(--surface)", 
         display: "flex", 
         flexDirection: "column", 
         alignItems: "center", 
