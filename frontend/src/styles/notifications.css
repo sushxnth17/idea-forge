@@ -24,7 +24,7 @@
   gap: 10px;
   flex-wrap: wrap;
   padding-bottom: 8px;
-  border-bottom: 2px solid #000000;
+  border-bottom: 1.5px solid #000000;
 }
 
 .notifications-tab-btn {
@@ -33,7 +33,7 @@
   gap: 6px;
   min-height: 38px;
   padding: 8px 16px;
-  border: 2px solid #000000 !important;
+  border: 1.5px solid #000000 !important;
   border-radius: 12px !important;
   background: #ffffff !important;
   color: #000000 !important;
@@ -49,7 +49,7 @@
 }
 
 .notifications-tab-btn--active {
-  background: #ff7a00 !important; /* Accent orange */
+  background: var(--accent) !important; /* Accent yellow */
   color: #000000 !important;
 }
 
@@ -76,7 +76,7 @@
   gap: 16px;
   padding: 18px 20px;
   background: #ffffff !important; /* Default white */
-  border: 3px solid #000000 !important;
+  border: 2px solid #000000 !important;
   border-radius: 16px !important;
   position: relative;
   overflow: hidden;
@@ -84,8 +84,8 @@
 }
 
 .notification-card--unread {
-  background: #fef9c3 !important; /* Soft yellow highlight for unread */
-  border-left: 8px solid #ff7a00 !important; /* Left highlight strip */
+  background: var(--accent-soft) !important; /* Soft yellow highlight for unread */
+  border-left: 4px solid var(--accent) !important; /* Left yellow highlight strip */
 }
 
 /* Left Icon Container */
@@ -94,7 +94,7 @@
   width: 48px;
   height: 48px;
   border-radius: 14px;
-  border: 2px solid #000000 !important;
+  border: 1.5px solid #000000 !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -115,7 +115,7 @@
 }
 
 .notification-card__icon-wrapper--remix {
-  background: #fef08a !important; /* Soft yellow */
+  background: var(--accent-soft) !important; /* Soft yellow */
 }
 
 /* Middle Content */
@@ -136,7 +136,7 @@
 
 .notification-card__username {
   font-weight: 900;
-  color: #ff7a00;
+  color: var(--text-strong);
 }
 
 .notification-card__date {
@@ -156,7 +156,7 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #ff7a00;
+  background: var(--accent); /* Yellow dot highlight */
   border: 1px solid #000000;
 }
 
@@ -164,7 +164,7 @@
   min-height: 32px;
   padding: 6px 12px;
   font-size: 0.8rem;
-  border: 2px solid #000000 !important;
+  border: 1.5px solid #000000 !important;
   border-radius: 8px !important;
   background: #ffffff !important;
   cursor: pointer;
@@ -178,8 +178,8 @@
 
 /* Empty notifications card */
 .notifications-empty {
-  border: 3px dashed #000000 !important;
-  background: #e9d5ff !important; /* Soft lavender */
+  border: 2px dashed #000000 !important;
+  background: var(--surface-soft) !important; /* Soft light gray */
   border-radius: 16px;
   padding: 48px;
   text-align: center;

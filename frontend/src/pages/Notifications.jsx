@@ -242,7 +242,7 @@ function Notifications() {
 
                                     {/* Actions Column */}
                                     <div className="notification-card__actions">
-                                        {!notification.is_read ? (
+                                        {!notification.is_read && (
                                             <>
                                                 <div className="notification-card__dot" title="Unread" />
                                                 <button
@@ -254,8 +254,6 @@ function Notifications() {
                                                     Read
                                                 </button>
                                             </>
-                                        ) : (
-                                            <span className="badge badge--muted" style={{ border: "1px solid #ddd" }}>Read</span>
                                         )}
                                     </div>
                                 </div>
