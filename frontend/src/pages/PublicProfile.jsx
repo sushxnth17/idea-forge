@@ -248,10 +248,8 @@ function PublicProfile() {
                     </div>
                 </div>
 
-                {/* Ideas Section */}
                 <div className="creator-profile__section-header">
                     <h2 className="creator-profile__section-title">💡 Shared Ideas</h2>
-                    <span className="badge">{ideas.length} Public {ideas.length === 1 ? "Idea" : "Ideas"}</span>
                 </div>
 
                 <div className="feed-grid">
@@ -269,58 +267,17 @@ function PublicProfile() {
                             return (
                                 <div key={idea.id} className="feed-card-wrapper">
                                     <article className="feed-card card">
-                                        <header className="feed-card__header">
-                                            <div className="feed-card__creator-info">
-                                                <div 
-                                                    className="feed-card__avatar" 
-                                                    style={{ backgroundColor: getAvatarColor(profile.id) }}
-                                                >
-                                                    {profile.profile_picture ? (
-                                                        <img 
-                                                            src={profile.profile_picture} 
-                                                            alt={profile.username} 
-                                                            className="feed-card__avatar-img" 
-                                                        />
-                                                    ) : (
-                                                        <span className="feed-card__avatar-text">{profile.username?.slice(0, 2).toUpperCase()}</span>
-                                                    )}
-                                                </div>
-                                                <div className="feed-card__creator-meta">
-                                                    <span className="feed-card__username">@{profile.username}</span>
-                                                    <span className="feed-card__date-separator">•</span>
-                                                    <time className="feed-card__date" dateTime={idea.created_at}>
-                                                        {formatDate(idea.created_at)}
-                                                    </time>
-                                                </div>
-                                            </div>
-                                            <div className="feed-card__header-badges">
-                                                {idea.parent_idea_id && <span className="badge">Remix</span>}
-                                            </div>
-                                        </header>
-
+                                        {/* 1. Content First */}
                                         <Link to={`/ideas/${idea.id}`} className="feed-card__content-link">
-                                            <h2 className="feed-card__title">{idea.title}</h2>
+                                            <h2 className="feed-card__title" style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                                                {idea.title}
+                                                {idea.parent_idea_id && <span className="badge" style={{ fontSize: "0.72rem", padding: "4px 8px" }}>Remix</span>}
+                                            </h2>
                                             <p className="feed-card__description">{idea.description}</p>
                                         </Link>
 
-                                        {tags.length > 0 && (
-                                            <div className="feed-card__tags" aria-label="Idea tags">
-                                                {tags.map((tag) => (
-                                                    <Link key={tag.id} to={`/search?tag=${encodeURIComponent(tag.name)}`} className="tag-pill">#{tag.name}</Link>
-                                                ))}
-                                            </div>
-                                        )}
-
-                                        {idea.parent_idea_id && (
-                                            <div className="feed-card__parent-remix">
-                                                <span className="remix-label">🔁 Remixed from </span>
-                                                <Link to={`/ideas/${idea.parent_idea_id}`} className="remix-parent-link">
-                                                    Idea #{idea.parent_idea_id}
-                                                </Link>
-                                            </div>
-                                        )}
-
-                                        <footer className="feed-card__actions" role="group" aria-label="Card actions">
+                                        {/* 2. Actions Second */}
+                                        <div className="feed-card__actions" style={{ borderTop: "2px solid #000000", borderBottom: "2px solid #000000", padding: "10px 0", marginTop: 4, display: "flex", gap: 12, alignItems: "center" }}>
                                             <button
                                                 type="button"
                                                 onClick={(e) => handleLike(idea.id, e)}
@@ -330,7 +287,7 @@ function PublicProfile() {
                                                 <svg className="action-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                                     <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
                                                 </svg>
-                                                <span className="action-count">{idea.likes_count}</span>
+                                                <span className="action-count" style={{ marginLeft: 4, fontWeight: "bold" }}>{idea.likes_count}</span>
                                             </button>
 
                                             <Link
@@ -339,9 +296,9 @@ function PublicProfile() {
                                                 title="Comment on Idea"
                                             >
                                                 <svg className="action-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                                                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
                                                 </svg>
-                                                <span className="action-count">{commentCount}</span>
+                                                <span className="action-count" style={{ marginLeft: 4, fontWeight: "bold" }}>{commentCount}</span>
                                             </Link>
 
                                             <button
@@ -356,7 +313,6 @@ function PublicProfile() {
                                                     <polyline points="7 23 3 19 7 15"/>
                                                     <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
                                                 </svg>
-                                                <span className="action-label">Remix</span>
                                             </button>
 
                                             <button
@@ -364,13 +320,60 @@ function PublicProfile() {
                                                 onClick={(e) => handleBookmark(idea.id, e)}
                                                 className="feed-card__action-btn feed-card__action-btn--bookmark"
                                                 title="Bookmark Idea"
+                                                style={{ marginLeft: "auto" }}
                                             >
                                                 <svg className="action-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                                     <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2Z"/>
                                                 </svg>
-                                                <span className="action-label">Save</span>
                                             </button>
-                                        </footer>
+                                        </div>
+
+                                        {/* 3. Metadata Third */}
+                                        <div className="feed-card__metadata-block" style={{ display: "grid", gap: 12, marginTop: 4 }}>
+                                            {tags.length > 0 && (
+                                                <div className="feed-card__tags" aria-label="Idea tags" style={{ margin: 0 }}>
+                                                    {tags.map((tag) => (
+                                                        <Link key={tag.id} to={`/search?tag=${encodeURIComponent(tag.name)}`} className="tag-pill">#{tag.name}</Link>
+                                                    ))}
+                                                </div>
+                                            )}
+
+                                            {idea.parent_idea_id && (
+                                                <div className="feed-card__parent-remix" style={{ margin: 0 }}>
+                                                    <span className="remix-label">🔁 Remixed from </span>
+                                                    <Link to={`/ideas/${idea.parent_idea_id}`} className="remix-parent-link">
+                                                        Idea #{idea.parent_idea_id}
+                                                    </Link>
+                                                </div>
+                                            )}
+
+                                            <div className="feed-card__creator-row" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginTop: 4 }}>
+                                                <div className="feed-card__creator-info" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                                    <div 
+                                                        className="feed-card__avatar" 
+                                                        style={{ backgroundColor: getAvatarColor(profile.id), width: 32, height: 32, borderRadius: "50%", border: "2px solid #000000", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.75rem", color: "#ffffff", fontWeight: "bold" }}
+                                                    >
+                                                        {profile.profile_picture ? (
+                                                            <img 
+                                                                src={profile.profile_picture} 
+                                                                alt={profile.username} 
+                                                                className="feed-card__avatar-img" 
+                                                                style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }}
+                                                            />
+                                                        ) : (
+                                                            <span>{profile.username?.slice(0, 2).toUpperCase()}</span>
+                                                        )}
+                                                    </div>
+                                                    <div className="feed-card__creator-meta" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                                        <span className="feed-card__username" style={{ fontWeight: "800", color: "#000000", fontSize: "0.85rem" }}>@{profile.username}</span>
+                                                        <span className="feed-card__date-separator" style={{ fontSize: "0.8rem" }}>•</span>
+                                                        <time className="feed-card__date" style={{ fontSize: "0.8rem", color: "#6b7280" }} dateTime={idea.created_at}>
+                                                            {formatDate(idea.created_at)}
+                                                        </time>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </article>
                                 </div>
                             );
