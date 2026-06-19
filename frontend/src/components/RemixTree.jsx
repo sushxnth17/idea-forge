@@ -34,7 +34,7 @@ function TreeNode({ node, isLast, level, prefix }) {
             display: "inline-flex",
             alignItems: "center",
             padding: "6px 14px",
-            border: isRoot ? "3px solid #000000" : "2px solid #000000",
+            border: isRoot ? "2px solid #000000" : "1.5px solid #000000",
             borderRadius: "8px",
             background: isRoot ? "#ff7a00" : "#ffffff",
             color: "#000000",
@@ -114,7 +114,7 @@ function RemixTree({ ideaId }) {
 
   if (loading) {
     return (
-      <div className="card" style={{ padding: "24px" }}>
+      <div className="card" style={{ padding: "28px" }}>
         <h3 style={{ marginBottom: "12px" }}>Remix Tree</h3>
         <p className="muted">Loading remix tree...</p>
       </div>
@@ -123,7 +123,7 @@ function RemixTree({ ideaId }) {
 
   if (error || !treeData) {
     return (
-      <div className="card" style={{ padding: "24px" }}>
+      <div className="card" style={{ padding: "28px" }}>
         <h3 style={{ marginBottom: "12px" }}>Remix Tree</h3>
         <p className="muted">Unable to load remix tree visualization.</p>
       </div>
@@ -133,7 +133,7 @@ function RemixTree({ ideaId }) {
   const hasChildren = treeData.children && treeData.children.length > 0;
 
   return (
-    <div className="card" style={{ padding: "24px" }}>
+    <div className="card" style={{ padding: "28px" }}>
       <h3 style={{ marginBottom: "20px" }}>Remix Tree</h3>
       
       {hasChildren ? (

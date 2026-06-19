@@ -11,9 +11,9 @@
 
 /* Creator Profile Header Card */
 .creator-profile__card {
-  border: 3px solid #000000 !important;
+  border: 2px solid #000000 !important; /* Softened from 3px */
   border-radius: var(--radius-lg) !important;
-  background: #fef9c3 !important; /* Soft Yellow */
+  background: var(--surface) !important; /* Clean white card */
   padding: 30px;
   display: flex;
   flex-direction: column;
@@ -50,7 +50,7 @@
   width: 110px;
   height: 110px;
   border-radius: 28px;
-  border: 3px solid #000000 !important;
+  border: 2px solid #000000 !important; /* Softened from 3px */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -94,13 +94,13 @@
 }
 
 .creator-profile__badge {
-  background: #ff7a00 !important;
+  background: var(--accent) !important; /* Yellow badge */
   color: #000000 !important;
   font-size: 0.78rem;
   font-weight: 800;
   padding: 4px 10px;
   border-radius: 8px !important;
-  border: 2px solid #000000 !important;
+  border: 1.5px solid #000000 !important; /* Softened from 2px */
 }
 
 .creator-profile__bio {
@@ -125,7 +125,7 @@
 }
 
 .creator-profile__btn--follow {
-  background: #ff7a00 !important; /* Accent orange */
+  background: var(--accent) !important; /* Accent yellow */
 }
 
 .creator-profile__btn--unfollow {
@@ -147,7 +147,7 @@
   gap: 8px;
   padding: 10px 16px;
   background: #ffffff !important;
-  border: 2px solid #000000 !important;
+  border: 1.5px solid #000000 !important; /* Softened from 2px */
   border-radius: 999px !important;
   font-weight: 800;
   color: #000000 !important;
@@ -157,7 +157,7 @@
 .creator-profile__stat-count {
   font-size: 1rem;
   font-weight: 900;
-  color: #ff7a00;
+  color: var(--text-strong); /* High contrast bold black count */
 }
 
 .creator-profile__meta-date {
@@ -170,7 +170,7 @@
 /* Section Header for Ideas */
 .creator-profile__section-header {
   margin-top: 10px;
-  border-bottom: 3px solid #000000;
+  border-bottom: 2px solid #000000; /* Softened from 3px */
   padding-bottom: 12px;
   display: flex;
   align-items: center;
@@ -186,8 +186,8 @@
 
 /* Empty Ideas State */
 .creator-profile__empty-state {
-  border: 3px dashed #000000 !important;
-  background: #e9d5ff !important; /* Soft lavender */
+  border: 2px dashed #000000 !important; /* Softened from 3px */
+  background: var(--surface-soft) !important; /* Soft light gray */
   border-radius: 16px;
   padding: 40px;
   text-align: center;

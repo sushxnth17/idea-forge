@@ -98,9 +98,6 @@ function Dashboard() {
               <Link to="/create" className="button button--primary">
                 Start an idea
               </Link>
-              <Link to="/feed" className="button button--secondary">
-                Open feed
-              </Link>
             </div>
           </div>
 
@@ -121,13 +118,6 @@ function Dashboard() {
                 className="button button--primary"
               >
                 Profile
-              </Link>
-
-              <Link
-                to="/notifications"
-                className="button button--secondary"
-              >
-                Notifications
               </Link>
             </div>
 
@@ -258,7 +248,6 @@ function Dashboard() {
                   <h3>{item.title}</h3>
                   <p className="muted">{item.description}</p>
                 </div>
-                <span className="dashboard-action-card__cta">Open</span>
               </Link>
             ))}
           </div>
@@ -280,7 +269,6 @@ function Dashboard() {
                   <h3>{item.title}</h3>
                   <p className="muted">{item.description}</p>
                 </div>
-                <span className="dashboard-feature-card__link">View</span>
               </Link>
             ))}
           </div>
