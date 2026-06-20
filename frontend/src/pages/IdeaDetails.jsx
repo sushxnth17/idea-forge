@@ -13,7 +13,8 @@ function parseAIReview(text) {
         strengths: [],
         weaknesses: [],
         targetAudience: [],
-        mvpSuggestions: []
+        mvpSuggestions: [],
+        monetizationIdeas: []
     };
     
     let currentKey = null;
@@ -23,25 +24,56 @@ function parseAIReview(text) {
         if (!line) continue;
         
         const lowerLine = line.toLowerCase();
-        if (lowerLine.startsWith("strengths:")) {
+        const cleanHeader = lowerLine.replace(/[\*#_:]/g, "").trim();
+        
+        if (cleanHeader === "strengths") {
             currentKey = "strengths";
-        } else if (lowerLine.startsWith("weaknesses:")) {
+            continue;
+        } else if (cleanHeader === "weaknesses") {
             currentKey = "weaknesses";
-        } else if (lowerLine.startsWith("target audience:")) {
+            continue;
+        } else if (cleanHeader === "target audience") {
             currentKey = "targetAudience";
-        } else if (lowerLine.startsWith("mvp suggestions:")) {
+            continue;
+        } else if (cleanHeader === "mvp suggestions") {
             currentKey = "mvpSuggestions";
-        } else if (line.startsWith("*") || line.startsWith("-")) {
-            if (currentKey) {
-                sections[currentKey].push(line.substring(1).trim());
+            continue;
+        } else if (cleanHeader === "monetization ideas") {
+            currentKey = "monetizationIdeas";
+            continue;
+        }
+        
+        if (currentKey) {
+            let content = line;
+            if (line.startsWith("*") || line.startsWith("-") || line.startsWith("•")) {
+                content = line.substring(1).trim();
+            } else {
+                const matchNum = line.match(/^\d+[\.\)]/);
+                if (matchNum) {
+                    content = line.substring(matchNum[0].length).trim();
+                }
             }
-        } else {
-            if (currentKey) {
-                sections[currentKey].push(line);
+            if (content) {
+                sections[currentKey].push(content);
             }
         }
     }
     return sections;
+}
+
+function formatMarkdownText(text) {
+    if (!text) return "";
+    
+    // Split the text by double asterisks `**`
+    const parts = text.split(/\*\*([^*]+)\*\*/g);
+    
+    return parts.map((part, idx) => {
+        // Every odd part was enclosed in `**`
+        if (idx % 2 === 1) {
+            return <strong key={idx}>{part}</strong>;
+        }
+        return part;
+    });
 }
 
 function IdeaDetails() {
@@ -411,7 +443,7 @@ function IdeaDetails() {
                                                 </h4>
                                                 <ul style={{ paddingLeft: "20px", margin: 0 }}>
                                                     {parsed.strengths.map((s, idx) => (
-                                                        <li key={idx} style={{ marginBottom: "4px" }}>{s}</li>
+                                                        <li key={idx} style={{ marginBottom: "4px" }}>{formatMarkdownText(s)}</li>
                                                     ))}
                                                 </ul>
                                             </div>
@@ -421,7 +453,7 @@ function IdeaDetails() {
                                                 </h4>
                                                 <ul style={{ paddingLeft: "20px", margin: 0 }}>
                                                     {parsed.weaknesses.map((w, idx) => (
-                                                        <li key={idx} style={{ marginBottom: "4px" }}>{w}</li>
+                                                        <li key={idx} style={{ marginBottom: "4px" }}>{formatMarkdownText(w)}</li>
                                                     ))}
                                                 </ul>
                                             </div>
@@ -431,7 +463,7 @@ function IdeaDetails() {
                                                 </h4>
                                                 <ul style={{ paddingLeft: "20px", margin: 0 }}>
                                                     {parsed.targetAudience.map((t, idx) => (
-                                                        <li key={idx} style={{ marginBottom: "4px" }}>{t}</li>
+                                                        <li key={idx} style={{ marginBottom: "4px" }}>{formatMarkdownText(t)}</li>
                                                     ))}
                                                 </ul>
                                             </div>
@@ -441,10 +473,22 @@ function IdeaDetails() {
                                                 </h4>
                                                 <ul style={{ paddingLeft: "20px", margin: 0 }}>
                                                     {parsed.mvpSuggestions.map((m, idx) => (
-                                                        <li key={idx} style={{ marginBottom: "4px" }}>{m}</li>
+                                                        <li key={idx} style={{ marginBottom: "4px" }}>{formatMarkdownText(m)}</li>
                                                     ))}
                                                 </ul>
                                             </div>
+                                            {parsed.monetizationIdeas && parsed.monetizationIdeas.length > 0 && (
+                                                <div className="card panel" style={{ padding: "16px", background: "var(--surface-soft)" }}>
+                                                    <h4 style={{ color: "#000000", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}>
+                                                        💰 Monetization Ideas
+                                                    </h4>
+                                                    <ul style={{ paddingLeft: "20px", margin: 0 }}>
+                                                        {parsed.monetizationIdeas.map((m, idx) => (
+                                                            <li key={idx} style={{ marginBottom: "4px" }}>{formatMarkdownText(m)}</li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
                                         </div>
                                     );
                                 })()}

@@ -30,6 +30,7 @@ async def generate_idea_review(title: str, description: str) -> str:
     headers = {
         "Authorization": f"Bearer {GROQ_API_KEY}",
         "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     }
 
     # Prompt requesting specific sections
@@ -63,7 +64,7 @@ Monetization Ideas:
 Keep the response concise, realistic, and highly actionable. Do not add any preamble, intro, or outro text."""
 
     data = {
-        "model": "llama3-8b-8192",
+        "model": "llama-3.1-8b-instant",
         "messages": [
             {
                 "role": "user",
