@@ -3,8 +3,9 @@ from sqlalchemy.orm import Session, joinedload, selectinload
 from sqlalchemy import or_, func
 from ..auth import get_current_user
 from ..database import get_db
-from ..models import (Idea, User, Tag, Like, Comment,Bookmark,Notification,Follow)
-from ..schemas import (IdeaCreate,IdeaResponse,CommentCreate,CommentResponse, BookmarkResponse, TagResponse, IdeaRemixTreeResponse)
+from ..models import (Idea, User, Tag, Like, Comment, Bookmark, Notification, Follow, AIReview)
+from ..schemas import (IdeaCreate, IdeaResponse, CommentCreate, CommentResponse, BookmarkResponse, TagResponse, IdeaRemixTreeResponse, AIReviewResponse)
+from ..services.ai_service import generate_idea_review
 
 
 router = APIRouter()
@@ -632,3 +633,94 @@ def get_idea_remix_tree(
 		)
 
 	return build_tree(root_idea)
+
+
+@router.post(
+	"/ideas/{idea_id}/ai-review",
+	response_model=AIReviewResponse,
+	status_code=status.HTTP_201_CREATED
+)
+async def generate_ai_review(
+	idea_id: int,
+	current_user: User = Depends(get_current_user),
+	db: Session = Depends(get_db),
+):
+	idea = (
+		db.query(Idea)
+		.filter(
+			Idea.id == idea_id,
+			Idea.owner_id == current_user.id
+		)
+		.first()
+	)
+
+	if idea is None:
+		raise HTTPException(
+			status_code=status.HTTP_404_NOT_FOUND,
+			detail="Idea not found"
+		)
+
+	# Generate review using AI service (calls Groq API)
+	try:
+		review_text = await generate_idea_review(idea.title, idea.description)
+	except ValueError as e:
+		raise HTTPException(
+			status_code=status.HTTP_400_BAD_REQUEST,
+			detail=str(e)
+		)
+	except Exception as e:
+		raise HTTPException(
+			status_code=status.HTTP_502_BAD_GATEWAY,
+			detail=str(e)
+		)
+
+	new_review = AIReview(
+		idea_id=idea_id,
+		review_text=review_text
+	)
+
+	db.add(new_review)
+	db.commit()
+	db.refresh(new_review)
+
+	return new_review
+
+
+@router.get(
+	"/ideas/{idea_id}/ai-review",
+	response_model=AIReviewResponse
+)
+def get_ai_review(
+	idea_id: int,
+	current_user: User = Depends(get_current_user),
+	db: Session = Depends(get_db),
+):
+	idea = (
+		db.query(Idea)
+		.filter(
+			Idea.id == idea_id,
+			Idea.owner_id == current_user.id
+		)
+		.first()
+	)
+
+	if idea is None:
+		raise HTTPException(
+			status_code=status.HTTP_404_NOT_FOUND,
+			detail="Idea not found"
+		)
+
+	review = (
+		db.query(AIReview)
+		.filter(AIReview.idea_id == idea_id)
+		.order_by(AIReview.created_at.desc())
+		.first()
+	)
+
+	if review is None:
+		raise HTTPException(
+			status_code=status.HTTP_404_NOT_FOUND,
+			detail="No AI review found for this idea"
+		)
+
+	return review
