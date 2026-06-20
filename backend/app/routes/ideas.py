@@ -5,7 +5,7 @@ from ..auth import get_current_user
 from ..database import get_db
 from ..models import (Idea, User, Tag, Like, Comment, Bookmark, Notification, Follow, AIReview)
 from ..schemas import (IdeaCreate, IdeaResponse, CommentCreate, CommentResponse, BookmarkResponse, TagResponse, IdeaRemixTreeResponse, AIReviewResponse)
-from ..services.ai_review import AIReviewService
+from ..services.ai_service import generate_idea_review
 
 
 router = APIRouter()
@@ -661,7 +661,7 @@ async def generate_ai_review(
 		)
 
 	# Generate mock review
-	review_text = await AIReviewService.generate_review(idea.title, idea.description)
+	review_text = await generate_idea_review(idea.title, idea.description)
 
 	new_review = AIReview(
 		idea_id=idea_id,
