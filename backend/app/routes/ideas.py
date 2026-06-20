@@ -660,8 +660,19 @@ async def generate_ai_review(
 			detail="Idea not found"
 		)
 
-	# Generate mock review
-	review_text = await generate_idea_review(idea.title, idea.description)
+	# Generate review using AI service (calls Groq API)
+	try:
+		review_text = await generate_idea_review(idea.title, idea.description)
+	except ValueError as e:
+		raise HTTPException(
+			status_code=status.HTTP_400_BAD_REQUEST,
+			detail=str(e)
+		)
+	except Exception as e:
+		raise HTTPException(
+			status_code=status.HTTP_502_BAD_GATEWAY,
+			detail=str(e)
+		)
 
 	new_review = AIReview(
 		idea_id=idea_id,
