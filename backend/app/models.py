@@ -46,6 +46,7 @@ class Idea(Base):
 	likes = relationship("Like", back_populates="idea", cascade="all, delete-orphan")
 	comments = relationship("Comment",back_populates="idea",cascade="all, delete-orphan")
 	bookmarks = relationship("Bookmark",back_populates="idea",cascade="all, delete-orphan")
+	ai_reviews = relationship("AIReview", back_populates="idea", cascade="all, delete-orphan")
 
 	@property
 	def likes_count(self):
@@ -227,4 +228,37 @@ class Follow(Base):
 	following = relationship(
 		"User",
 		foreign_keys=[following_id]
+	)
+
+
+class AIReview(Base):
+	__tablename__ = "ai_reviews"
+
+	id = Column(
+		Integer,
+		primary_key=True,
+		index=True
+	)
+
+	idea_id = Column(
+		Integer,
+		ForeignKey("ideas.id"),
+		index=True,
+		nullable=False
+	)
+
+	review_text = Column(
+		Text,
+		nullable=False
+	)
+
+	created_at = Column(
+		DateTime(timezone=True),
+		server_default=func.now(),
+		nullable=False
+	)
+
+	idea = relationship(
+		"Idea",
+		back_populates="ai_reviews"
 	)
