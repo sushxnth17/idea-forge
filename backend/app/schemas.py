@@ -208,5 +208,6 @@ class CollaborationRequestResponse(BaseModel):
 	status: str
 	message: str | None = None
 	created_at: datetime
+	requester: IdeaOwnerResponse | None = None
 
 	model_config = ConfigDict(from_attributes=True)

@@ -803,17 +803,26 @@ def get_collaboration_requests(
 			detail="Idea not found"
 		)
 
-	# 2. Check authorization: only the idea owner can view requests
-	if idea.owner_id != current_user.id:
-		raise HTTPException(
-			status_code=status.HTTP_403_FORBIDDEN,
-			detail="Only the idea owner can view collaboration requests"
+	# 2. Check authorization: owner sees all, requester sees their own
+	if idea.owner_id == current_user.id:
+		requests = (
+			db.query(CollaborationRequest)
+			.options(joinedload(CollaborationRequest.requester))
+			.filter(CollaborationRequest.idea_id == idea_id)
+			.order_by(CollaborationRequest.created_at.desc())
+			.all()
 		)
-
-	# 3. Fetch all requests for this idea
-	requests = db.query(CollaborationRequest).filter(
-		CollaborationRequest.idea_id == idea_id
-	).order_by(CollaborationRequest.created_at.desc()).all()
+	else:
+		requests = (
+			db.query(CollaborationRequest)
+			.options(joinedload(CollaborationRequest.requester))
+			.filter(
+				CollaborationRequest.idea_id == idea_id,
+				CollaborationRequest.requester_id == current_user.id
+			)
+			.order_by(CollaborationRequest.created_at.desc())
+			.all()
+		)
 
 	return requests
 
