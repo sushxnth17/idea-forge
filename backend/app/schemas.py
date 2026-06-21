@@ -195,3 +195,18 @@ class IdeaRemixTreeResponse(BaseModel):
 
 
 IdeaRemixTreeResponse.model_rebuild()
+
+
+class CollaborationRequestCreate(BaseModel):
+	message: str | None = None
+
+
+class CollaborationRequestResponse(BaseModel):
+	id: int
+	idea_id: int
+	requester_id: int
+	status: str
+	message: str | None = None
+	created_at: datetime
+
+	model_config = ConfigDict(from_attributes=True)

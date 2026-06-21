@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session, joinedload, selectinload
 from sqlalchemy import or_, func
 from ..auth import get_current_user
 from ..database import get_db
-from ..models import (Idea, User, Tag, Like, Comment, Bookmark, Notification, Follow, AIReview)
-from ..schemas import (IdeaCreate, IdeaResponse, CommentCreate, CommentResponse, BookmarkResponse, TagResponse, IdeaRemixTreeResponse, AIReviewResponse)
+from ..models import (Idea, User, Tag, Like, Comment, Bookmark, Notification, Follow, AIReview, CollaborationRequest)
+from ..schemas import (IdeaCreate, IdeaResponse, CommentCreate, CommentResponse, BookmarkResponse, TagResponse, IdeaRemixTreeResponse, AIReviewResponse, CollaborationRequestCreate, CollaborationRequestResponse)
 from ..services.ai_service import generate_idea_review
 
 
@@ -724,3 +724,189 @@ def get_ai_review(
 		)
 
 	return review
+
+
+@router.post(
+	"/ideas/{idea_id}/collaboration-request",
+	response_model=CollaborationRequestResponse,
+	status_code=status.HTTP_201_CREATED
+)
+def create_collaboration_request(
+	idea_id: int,
+	collab_req: CollaborationRequestCreate,
+	current_user: User = Depends(get_current_user),
+	db: Session = Depends(get_db)
+):
+	# 1. Fetch idea and verify exists
+	idea = db.query(Idea).filter(Idea.id == idea_id).first()
+	if not idea:
+		raise HTTPException(
+			status_code=status.HTTP_404_NOT_FOUND,
+			detail="Idea not found"
+		)
+
+	# 2. Cannot request collaboration on their own idea
+	if idea.owner_id == current_user.id:
+		raise HTTPException(
+			status_code=status.HTTP_400_BAD_REQUEST,
+			detail="Cannot request collaboration on your own idea"
+		)
+
+	# 3. Prevent duplicate pending requests
+	existing_pending = db.query(CollaborationRequest).filter(
+		CollaborationRequest.idea_id == idea_id,
+		CollaborationRequest.requester_id == current_user.id,
+		CollaborationRequest.status == "pending"
+	).first()
+	
+	if existing_pending:
+		raise HTTPException(
+			status_code=status.HTTP_400_BAD_REQUEST,
+			detail="You already have a pending collaboration request for this idea"
+		)
+
+	# 4. Create collaboration request
+	new_request = CollaborationRequest(
+		idea_id=idea_id,
+		requester_id=current_user.id,
+		status="pending",
+		message=collab_req.message
+	)
+	db.add(new_request)
+
+	# 5. Create notification for the idea owner
+	notification = Notification(
+		message=f"{current_user.username} requested to collaborate on your idea '{idea.title}'",
+		user_id=idea.owner_id
+	)
+	db.add(notification)
+	
+	db.commit()
+	db.refresh(new_request)
+	return new_request
+
+
+@router.get(
+	"/ideas/{idea_id}/collaboration-requests",
+	response_model=list[CollaborationRequestResponse]
+)
+def get_collaboration_requests(
+	idea_id: int,
+	current_user: User = Depends(get_current_user),
+	db: Session = Depends(get_db)
+):
+	# 1. Fetch idea and verify exists
+	idea = db.query(Idea).filter(Idea.id == idea_id).first()
+	if not idea:
+		raise HTTPException(
+			status_code=status.HTTP_404_NOT_FOUND,
+			detail="Idea not found"
+		)
+
+	# 2. Check authorization: only the idea owner can view requests
+	if idea.owner_id != current_user.id:
+		raise HTTPException(
+			status_code=status.HTTP_403_FORBIDDEN,
+			detail="Only the idea owner can view collaboration requests"
+		)
+
+	# 3. Fetch all requests for this idea
+	requests = db.query(CollaborationRequest).filter(
+		CollaborationRequest.idea_id == idea_id
+	).order_by(CollaborationRequest.created_at.desc()).all()
+
+	return requests
+
+
+@router.patch(
+	"/collaboration-requests/{id}/accept",
+	response_model=CollaborationRequestResponse
+)
+def accept_collaboration_request(
+	id: int,
+	current_user: User = Depends(get_current_user),
+	db: Session = Depends(get_db)
+):
+	# 1. Fetch collaboration request and check existence
+	collab_request = db.query(CollaborationRequest).filter(CollaborationRequest.id == id).first()
+	if not collab_request:
+		raise HTTPException(
+			status_code=status.HTTP_404_NOT_FOUND,
+			detail="Collaboration request not found"
+		)
+
+	# 2. Verify authorization: only the owner of the idea can accept
+	idea = collab_request.idea
+	if idea.owner_id != current_user.id:
+		raise HTTPException(
+			status_code=status.HTTP_403_FORBIDDEN,
+			detail="Only the idea owner can accept collaboration requests"
+		)
+
+	# 3. Check status is pending
+	if collab_request.status != "pending":
+		raise HTTPException(
+			status_code=status.HTTP_400_BAD_REQUEST,
+			detail=f"Collaboration request has already been {collab_request.status}"
+		)
+
+	# 4. Accept collaboration request
+	collab_request.status = "accepted"
+
+	# 5. Create notification for the requester
+	notification = Notification(
+		message=f"Your collaboration request for '{idea.title}' was accepted by {current_user.username}",
+		user_id=collab_request.requester_id
+	)
+	db.add(notification)
+
+	db.commit()
+	db.refresh(collab_request)
+	return collab_request
+
+
+@router.patch(
+	"/collaboration-requests/{id}/reject",
+	response_model=CollaborationRequestResponse
+)
+def reject_collaboration_request(
+	id: int,
+	current_user: User = Depends(get_current_user),
+	db: Session = Depends(get_db)
+):
+	# 1. Fetch collaboration request and check existence
+	collab_request = db.query(CollaborationRequest).filter(CollaborationRequest.id == id).first()
+	if not collab_request:
+		raise HTTPException(
+			status_code=status.HTTP_404_NOT_FOUND,
+			detail="Collaboration request not found"
+		)
+
+	# 2. Verify authorization: only the owner of the idea can reject
+	idea = collab_request.idea
+	if idea.owner_id != current_user.id:
+		raise HTTPException(
+			status_code=status.HTTP_403_FORBIDDEN,
+			detail="Only the idea owner can reject collaboration requests"
+		)
+
+	# 3. Check status is pending
+	if collab_request.status != "pending":
+		raise HTTPException(
+			status_code=status.HTTP_400_BAD_REQUEST,
+			detail=f"Collaboration request has already been {collab_request.status}"
+		)
+
+	# 4. Reject collaboration request
+	collab_request.status = "rejected"
+
+	# 5. Create notification for the requester
+	notification = Notification(
+		message=f"Your collaboration request for '{idea.title}' was rejected by the owner",
+		user_id=collab_request.requester_id
+	)
+	db.add(notification)
+
+	db.commit()
+	db.refresh(collab_request)
+	return collab_request
