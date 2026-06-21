@@ -418,6 +418,67 @@ function IdeaDetails() {
                         </div>
                     </div>
 
+                    {/* Collaborators Card */}
+                    <div className="card panel" style={{ marginTop: 16 }}>
+                        <h3 style={{ marginBottom: 12, display: "flex", alignItems: "center", gap: "8px" }}>
+                            👥 Collaborators ({idea.collaborators?.length || 0})
+                        </h3>
+                        {idea.collaborators && idea.collaborators.length > 0 ? (
+                            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                                {idea.collaborators.map((collab) => (
+                                    <Link
+                                        key={collab.id}
+                                        to={currentUser && collab.id === currentUser.id ? "/profile" : `/user/${collab.id}`}
+                                        style={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: "10px",
+                                            padding: "8px 12px",
+                                            background: "var(--surface-soft)",
+                                            border: "2px solid #000000",
+                                            borderRadius: "8px",
+                                            textDecoration: "none",
+                                            color: "inherit",
+                                            fontWeight: "bold",
+                                            transition: "transform 0.1s ease, box-shadow 0.1s ease",
+                                            boxShadow: "2px 2px 0px #000000",
+                                        }}
+                                        className="collab-item"
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.transform = "translate(-1px, -1px)";
+                                            e.currentTarget.style.boxShadow = "3px 3px 0px #000000";
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.transform = "none";
+                                            e.currentTarget.style.boxShadow = "2px 2px 0px #000000";
+                                        }}
+                                    >
+                                        {collab.profile_picture ? (
+                                            <img
+                                                src={collab.profile_picture}
+                                                alt=""
+                                                style={{
+                                                    width: "28px",
+                                                    height: "28px",
+                                                    borderRadius: "50%",
+                                                    border: "1px solid black",
+                                                    objectFit: "cover",
+                                                }}
+                                            />
+                                        ) : (
+                                            <span style={{ fontSize: "1.3rem" }}>👤</span>
+                                        )}
+                                        <span>@{collab.username}</span>
+                                    </Link>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="muted" style={{ fontSize: "0.9rem", margin: 0 }}>
+                                No collaborators yet.
+                            </p>
+                        )}
+                    </div>
+
                     <RemixLineage parentIdeaId={idea.parent_idea_id} currentIdea={idea} />
 
                     <div className="card panel" style={{marginTop:16}}>

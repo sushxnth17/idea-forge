@@ -88,7 +88,8 @@ def get_single_idea(
 			joinedload(Idea.owner),
 			selectinload(Idea.tags),
 			selectinload(Idea.likes),
-			selectinload(Idea.comments).joinedload(Comment.user)
+			selectinload(Idea.comments).joinedload(Comment.user),
+			selectinload(Idea.collaboration_requests).joinedload(CollaborationRequest.requester)
 		)
 		.filter(
 			Idea.id == idea_id,
@@ -518,7 +519,8 @@ def get_public_idea(
             joinedload(Idea.owner),
             selectinload(Idea.tags),
             selectinload(Idea.likes),
-            selectinload(Idea.comments).joinedload(Comment.user)
+            selectinload(Idea.comments).joinedload(Comment.user),
+            selectinload(Idea.collaboration_requests).joinedload(CollaborationRequest.requester)
         )
         .filter(
             Idea.id == idea_id,

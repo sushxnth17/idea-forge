@@ -54,6 +54,10 @@ class Idea(Base):
 	def likes_count(self):
 		return len(self.likes)
 
+	@property
+	def collaborators(self):
+		return [req.requester for req in self.collaboration_requests if req.status == "accepted"]
+
 class Tag(Base):
 	__tablename__ = "tags"
 
