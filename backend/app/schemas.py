@@ -197,6 +197,13 @@ class IdeaRemixTreeResponse(BaseModel):
 IdeaRemixTreeResponse.model_rebuild()
 
 
+class SimpleIdeaResponse(BaseModel):
+	id: int
+	title: str
+
+	model_config = ConfigDict(from_attributes=True)
+
+
 class CollaborationRequestCreate(BaseModel):
 	message: str | None = None
 
@@ -209,5 +216,6 @@ class CollaborationRequestResponse(BaseModel):
 	message: str | None = None
 	created_at: datetime
 	requester: IdeaOwnerResponse | None = None
+	idea: SimpleIdeaResponse | None = None
 
 	model_config = ConfigDict(from_attributes=True)

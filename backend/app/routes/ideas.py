@@ -827,6 +827,29 @@ def get_collaboration_requests(
 	return requests
 
 
+@router.get(
+	"/collaboration-requests/incoming",
+	response_model=list[CollaborationRequestResponse]
+)
+def get_incoming_collaboration_requests(
+	current_user: User = Depends(get_current_user),
+	db: Session = Depends(get_db)
+):
+	# Fetch all collaboration requests for all ideas owned by the current user
+	requests = (
+		db.query(CollaborationRequest)
+		.join(Idea)
+		.options(
+			joinedload(CollaborationRequest.requester),
+			joinedload(CollaborationRequest.idea)
+		)
+		.filter(Idea.owner_id == current_user.id)
+		.order_by(CollaborationRequest.created_at.desc())
+		.all()
+	)
+	return requests
+
+
 @router.patch(
 	"/collaboration-requests/{id}/accept",
 	response_model=CollaborationRequestResponse

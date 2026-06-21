@@ -52,6 +52,10 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [topIdeaStatus, setTopIdeaStatus] = useState(null);
 
+  // Collaboration state
+  const [collabRequests, setCollabRequests] = useState([]);
+  const [collabLoading, setCollabLoading] = useState(true);
+
   useEffect(() => {
     async function fetchStats() {
       try {
@@ -71,8 +75,33 @@ function Dashboard() {
         setLoading(false);
       }
     }
+
+    async function fetchCollabRequests() {
+      try {
+        const response = await api.get("/collaboration-requests/incoming");
+        setCollabRequests(response.data);
+      } catch (error) {
+        console.error("Error fetching incoming collaboration requests:", error);
+      } finally {
+        setCollabLoading(false);
+      }
+    }
+
     fetchStats();
+    fetchCollabRequests();
   }, []);
+
+  async function handleUpdateCollabStatus(requestId, action) {
+    try {
+      const response = await api.patch(`/collaboration-requests/${requestId}/${action}`);
+      setCollabRequests(prev =>
+        prev.map(req => req.id === requestId ? response.data : req)
+      );
+    } catch (error) {
+      console.error(`Error performing action ${action} on request ${requestId}:`, error);
+      alert(error.response?.data?.detail || `Failed to ${action} collaboration request.`);
+    }
+  }
 
   function handleLogout() {
     localStorage.removeItem("token");
@@ -228,6 +257,88 @@ function Dashboard() {
                   </Link>
                 </div>
               )}
+            </div>
+          )}
+        </section>
+
+        {/* Collaboration Requests Section */}
+        <section className="dashboard-section" style={{ marginTop: 32 }}>
+          <div className="dashboard-section__header">
+            <div>
+              <p className="page__eyebrow">Collaboration</p>
+              <h2>Incoming Requests</h2>
+            </div>
+          </div>
+
+          {collabLoading && (
+            <div className="loading-state card">
+              <h3>Loading requests...</h3>
+              <p className="muted">Retrieving incoming collaboration requests from the database.</p>
+            </div>
+          )}
+
+          {!collabLoading && collabRequests.length === 0 && (
+            <div className="card panel" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px 20px", textAlign: "center" }}>
+              <div style={{ fontSize: "2rem", marginBottom: 12 }}>🤝</div>
+              <h3>No incoming requests</h3>
+              <p className="muted">When other creators want to collaborate on your ideas, they will show up here.</p>
+            </div>
+          )}
+
+          {!collabLoading && collabRequests.length > 0 && (
+            <div style={{ display: "grid", gap: "16px" }}>
+              {collabRequests.map((req) => (
+                <div key={req.id} className="card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                      {req.requester?.profile_picture ? (
+                        <img src={req.requester.profile_picture} alt="" style={{ width: "24px", height: "24px", borderRadius: "50%", border: "1px solid black" }} />
+                      ) : (
+                        <span style={{ fontSize: "1.2rem" }}>👤</span>
+                      )}
+                      <strong className="badge badge--muted">
+                        @{req.requester?.username || `user_${req.requester_id}`}
+                      </strong>
+                      <span>requested to collaborate on</span>
+                      <Link to={`/ideas/${req.idea_id}`} style={{ textDecoration: "underline", fontWeight: "bold" }}>
+                        {req.idea?.title || `Idea #${req.idea_id}`}
+                      </Link>
+                    </div>
+                    <p style={{ margin: "12px 0 6px 0", fontSize: "0.95rem", color: "var(--text-strong)" }}>
+                      "{req.message}"
+                    </p>
+                    <div style={{ display: "flex", alignItems: "center", gap: "12px", fontSize: "0.85rem" }}>
+                      <span className={`badge ${req.status === "accepted" ? "badge--success" : req.status === "rejected" ? "badge--danger" : "badge--warning"}`} style={{ padding: "2px 8px", fontSize: "0.75rem" }}>
+                        {req.status.toUpperCase()}
+                      </span>
+                      <span className="muted">
+                        {new Date(req.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                      </span>
+                    </div>
+                  </div>
+
+                  {req.status === "pending" && (
+                    <div style={{ display: "flex", gap: "8px" }}>
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateCollabStatus(req.id, "accept")}
+                        className="button button--primary"
+                        style={{ minHeight: "38px", padding: "8px 14px", fontSize: "0.85rem", background: "var(--success)", color: "white" }}
+                      >
+                        Accept
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateCollabStatus(req.id, "reject")}
+                        className="button button--secondary"
+                        style={{ minHeight: "38px", padding: "8px 14px", fontSize: "0.85rem", background: "#fecaca", color: "#b91c1c", borderColor: "#fecaca" }}
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           )}
         </section>
