@@ -27,6 +27,7 @@ class User(Base):
 	notifications = relationship("Notification",back_populates="user",cascade="all, delete-orphan")
 	followers = relationship("Follow",foreign_keys="Follow.following_id",cascade="all, delete-orphan")
 	following = relationship("Follow",foreign_keys="Follow.follower_id",cascade="all, delete-orphan")
+	collaboration_requests = relationship("CollaborationRequest", back_populates="requester", foreign_keys="CollaborationRequest.requester_id", cascade="all, delete-orphan")
 
 
 class Idea(Base):
@@ -47,10 +48,15 @@ class Idea(Base):
 	comments = relationship("Comment",back_populates="idea",cascade="all, delete-orphan")
 	bookmarks = relationship("Bookmark",back_populates="idea",cascade="all, delete-orphan")
 	ai_reviews = relationship("AIReview", back_populates="idea", cascade="all, delete-orphan")
+	collaboration_requests = relationship("CollaborationRequest", back_populates="idea", cascade="all, delete-orphan")
 
 	@property
 	def likes_count(self):
 		return len(self.likes)
+
+	@property
+	def collaborators(self):
+		return [req.requester for req in self.collaboration_requests if req.status == "accepted"]
 
 class Tag(Base):
 	__tablename__ = "tags"
@@ -262,3 +268,17 @@ class AIReview(Base):
 		"Idea",
 		back_populates="ai_reviews"
 	)
+
+
+class CollaborationRequest(Base):
+	__tablename__ = "collaboration_requests"
+
+	id = Column(Integer, primary_key=True, index=True)
+	idea_id = Column(Integer, ForeignKey("ideas.id"), index=True, nullable=False)
+	requester_id = Column(Integer, ForeignKey("users.id"), index=True, nullable=False)
+	status = Column(String, default="pending", nullable=False)  # pending, accepted, rejected
+	message = Column(Text, nullable=True)
+	created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+	idea = relationship("Idea", back_populates="collaboration_requests")
+	requester = relationship("User", back_populates="collaboration_requests", foreign_keys=[requester_id])

@@ -5,11 +5,9 @@ import urllib.error
 import asyncio
 from dotenv import load_dotenv
 
-# Ensure environment variables are loaded
-load_dotenv()
-
-# Retrieve GROQ_API_KEY environment variable
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+# Ensure environment variables are loaded from the backend/.env file relative to this file
+dotenv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".env"))
+load_dotenv(dotenv_path=dotenv_path)
 
 
 async def generate_idea_review(title: str, description: str) -> str:
@@ -17,8 +15,14 @@ async def generate_idea_review(title: str, description: str) -> str:
     Generates a structured AI review for the startup idea using the Groq API.
     Raises ValueError if GROQ_API_KEY is missing or unconfigured.
     """
+    # Load environment variables dynamically to pick up any changes
+    dotenv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".env"))
+    load_dotenv(dotenv_path=dotenv_path)
+    
+    groq_api_key = os.getenv("GROQ_API_KEY")
+
     # Verify that the API key is present and is not the default placeholder
-    if not GROQ_API_KEY or GROQ_API_KEY.strip() == "" or GROQ_API_KEY == "your_groq_api_key_here":
+    if not groq_api_key or groq_api_key.strip() == "" or groq_api_key == "your_groq_api_key_here":
         raise ValueError(
             "GROQ_API_KEY is missing or un configured. "
             "Please configure a valid GROQ_API_KEY in your environment/dotenv file."
@@ -28,7 +32,7 @@ async def generate_idea_review(title: str, description: str) -> str:
     url = "https://api.groq.com/openai/v1/chat/completions"
     
     headers = {
-        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Authorization": f"Bearer {groq_api_key}",
         "Content-Type": "application/json",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     }

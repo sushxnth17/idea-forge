@@ -2376,3 +2376,67 @@ a:focus-visible {
   width: 100px;
   border-radius: 16px !important;
 }
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: grid;
+  place-items: center;
+  z-index: 1000;
+  padding: 16px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Modal Content Card */
+.modal-card {
+  width: min(540px, 100%);
+  border: 2px solid #000000 !important;
+  border-radius: 16px !important;
+  background: var(--surface) !important;
+  color: #000000 !important;
+  padding: 28px !important;
+  box-shadow: none !important;
+  position: relative;
+  display: grid;
+  gap: 20px;
+  animation: scaleUp 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #000000;
+  padding-bottom: 12px;
+}
+
+.modal-close-button {
+  background: transparent !important;
+  border: none !important;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: auto !important;
+  width: auto !important;
+}
+
+.modal-close-button:hover {
+  transform: scale(1.1) !important;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}

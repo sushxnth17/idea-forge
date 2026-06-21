@@ -113,6 +113,7 @@ class IdeaResponse(BaseModel):
 	likes_count: int = 0
 	comments: list[CommentResponse] = []
 	ai_reviews: list[AIReviewResponse] = []
+	collaborators: list[IdeaOwnerResponse] = []
 	parent_idea_id: int | None = None
 	created_at: datetime
 	owner_id: int
@@ -195,3 +196,27 @@ class IdeaRemixTreeResponse(BaseModel):
 
 
 IdeaRemixTreeResponse.model_rebuild()
+
+
+class SimpleIdeaResponse(BaseModel):
+	id: int
+	title: str
+
+	model_config = ConfigDict(from_attributes=True)
+
+
+class CollaborationRequestCreate(BaseModel):
+	message: str | None = None
+
+
+class CollaborationRequestResponse(BaseModel):
+	id: int
+	idea_id: int
+	requester_id: int
+	status: str
+	message: str | None = None
+	created_at: datetime
+	requester: IdeaOwnerResponse | None = None
+	idea: SimpleIdeaResponse | None = None
+
+	model_config = ConfigDict(from_attributes=True)

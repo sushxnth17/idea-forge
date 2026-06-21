@@ -89,6 +89,14 @@ function IdeaDetails() {
     const [isGenerating, setIsGenerating] = useState(false);
     const [aiError, setAiError] = useState(null);
 
+    // Collaboration Request State
+    const [collabRequests, setCollabRequests] = useState([]);
+    const [showCollabModal, setShowCollabModal] = useState(false);
+    const [collabMessage, setCollabMessage] = useState("");
+    const [collabLoading, setCollabLoading] = useState(false);
+    const [collabError, setCollabError] = useState(null);
+    const [collabSuccess, setCollabSuccess] = useState(false);
+
     async function fetchAIReview() {
         if (!currentUser || !idea || idea.owner_id !== currentUser.id) {
             return;
@@ -122,6 +130,52 @@ function IdeaDetails() {
         }
     }
 
+    async function fetchCollabRequests() {
+        if (!currentUser || !idea) {
+            return;
+        }
+        try {
+            const response = await api.get(`/ideas/${id}/collaboration-requests`);
+            setCollabRequests(response.data);
+        } catch (error) {
+            console.log("Error loading collaboration requests:", error);
+        }
+    }
+
+    async function handleSendCollabRequest(e) {
+        e.preventDefault();
+        setCollabLoading(true);
+        setCollabError(null);
+        setCollabSuccess(false);
+        try {
+            const response = await api.post(`/ideas/${id}/collaboration-request`, {
+                message: collabMessage
+            });
+            setCollabRequests(prev => [response.data, ...prev]);
+            setCollabSuccess(true);
+            setCollabMessage("");
+            setTimeout(() => {
+                setShowCollabModal(false);
+                setCollabSuccess(false);
+            }, 2000);
+        } catch (error) {
+            console.log("Error sending collaboration request:", error);
+            setCollabError(error.response?.data?.detail || "Could not send collaboration request.");
+        } finally {
+            setCollabLoading(false);
+        }
+    }
+
+    async function handleUpdateCollabStatus(requestId, action) {
+        try {
+            const response = await api.patch(`/collaboration-requests/${requestId}/${action}`);
+            setCollabRequests(prev => prev.map(req => req.id === requestId ? response.data : req));
+        } catch (error) {
+            console.log(`Error ${action}ing collaboration request:`, error);
+            alert(error.response?.data?.detail || `Could not ${action} collaboration request.`);
+        }
+    }
+
     useEffect(() => {
         async function loadCurrentUser() {
             try {
@@ -135,8 +189,11 @@ function IdeaDetails() {
     }, []);
 
     useEffect(() => {
-        if (currentUser && idea && idea.owner_id === currentUser.id) {
-            fetchAIReview();
+        if (currentUser && idea) {
+            if (idea.owner_id === currentUser.id) {
+                fetchAIReview();
+            }
+            fetchCollabRequests();
         }
     }, [id, currentUser, idea?.id]);
 
@@ -301,6 +358,28 @@ function IdeaDetails() {
                                 </button>
                             </div>
 
+                            {currentUser && idea.owner_id !== currentUser.id && !collabRequests.some(req => req.status === "pending") && (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setShowCollabModal(true);
+                                        setCollabError(null);
+                                        setCollabSuccess(false);
+                                        setCollabMessage("I would like to contribute to this project.");
+                                    }}
+                                    className="button button--secondary button--full"
+                                    style={{ marginTop: 12, width: "100%", justifyContent: "center" }}
+                                >
+                                    🤝 Request Collaboration
+                                </button>
+                            )}
+
+                            {currentUser && idea.owner_id !== currentUser.id && collabRequests.some(req => req.status === "pending") && (
+                                <div className="badge badge--warning" style={{ marginTop: 12, width: "100%", justifyContent: "center", borderRadius: "16px" }}>
+                                    ⏳ Collaboration Pending
+                                </div>
+                            )}
+
                             {currentUser && idea.owner_id === currentUser.id && (
                                 <>
                                     <button
@@ -337,6 +416,67 @@ function IdeaDetails() {
                                 <div className="badge badge--muted">{idea.is_premium ? 'Premium' : 'Free'}</div>
                             </div>
                         </div>
+                    </div>
+
+                    {/* Collaborators Card */}
+                    <div className="card panel" style={{ marginTop: 16 }}>
+                        <h3 style={{ marginBottom: 12, display: "flex", alignItems: "center", gap: "8px" }}>
+                            👥 Collaborators ({idea.collaborators?.length || 0})
+                        </h3>
+                        {idea.collaborators && idea.collaborators.length > 0 ? (
+                            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                                {idea.collaborators.map((collab) => (
+                                    <Link
+                                        key={collab.id}
+                                        to={currentUser && collab.id === currentUser.id ? "/profile" : `/user/${collab.id}`}
+                                        style={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: "10px",
+                                            padding: "8px 12px",
+                                            background: "var(--surface-soft)",
+                                            border: "2px solid #000000",
+                                            borderRadius: "8px",
+                                            textDecoration: "none",
+                                            color: "inherit",
+                                            fontWeight: "bold",
+                                            transition: "transform 0.1s ease, box-shadow 0.1s ease",
+                                            boxShadow: "2px 2px 0px #000000",
+                                        }}
+                                        className="collab-item"
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.transform = "translate(-1px, -1px)";
+                                            e.currentTarget.style.boxShadow = "3px 3px 0px #000000";
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.transform = "none";
+                                            e.currentTarget.style.boxShadow = "2px 2px 0px #000000";
+                                        }}
+                                    >
+                                        {collab.profile_picture ? (
+                                            <img
+                                                src={collab.profile_picture}
+                                                alt=""
+                                                style={{
+                                                    width: "28px",
+                                                    height: "28px",
+                                                    borderRadius: "50%",
+                                                    border: "1px solid black",
+                                                    objectFit: "cover",
+                                                }}
+                                            />
+                                        ) : (
+                                            <span style={{ fontSize: "1.3rem" }}>👤</span>
+                                        )}
+                                        <span>@{collab.username}</span>
+                                    </Link>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="muted" style={{ fontSize: "0.9rem", margin: 0 }}>
+                                No collaborators yet.
+                            </p>
+                        )}
                     </div>
 
                     <RemixLineage parentIdeaId={idea.parent_idea_id} currentIdea={idea} />
@@ -497,6 +637,57 @@ function IdeaDetails() {
                     </div>
                 </section>
             )}
+            {/* Owner Collaboration Requests Section */}
+            {currentUser && idea.owner_id === currentUser.id && collabRequests.length > 0 && (
+                <section className="details-collab-requests" style={{ marginTop: 24 }}>
+                    <div className="card">
+                        <h3 style={{ marginBottom: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
+                            🤝 Collaboration Requests
+                        </h3>
+                        <div style={{ display: "grid", gap: "16px" }}>
+                            {collabRequests.map((req) => (
+                                <div key={req.id} className="card panel" style={{ padding: "16px", background: "var(--surface-soft)", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
+                                    <div>
+                                        <div style={{ fontWeight: "bold", fontSize: "0.95rem", display: "flex", alignItems: "center", gap: "8px" }}>
+                                            {req.requester?.profile_picture ? (
+                                                <img src={req.requester.profile_picture} alt="" style={{ width: "24px", height: "24px", borderRadius: "50%", border: "1px solid black" }} />
+                                            ) : (
+                                                <span style={{ fontSize: "1.2rem" }}>👤</span>
+                                            )}
+                                            @{req.requester?.username || `user_${req.requester_id}`}
+                                        </div>
+                                        <p style={{ margin: "8px 0", fontSize: "0.95rem", color: "var(--text-strong)" }}>"{req.message}"</p>
+                                        <div style={{ fontSize: "0.85rem", marginTop: "4px" }}>
+                                            Status: <span className={`badge ${req.status === "accepted" ? "badge--success" : req.status === "rejected" ? "badge--danger" : "badge--warning"}`} style={{ padding: "2px 8px", fontSize: "0.75rem" }}>{req.status.toUpperCase()}</span>
+                                            <span className="muted" style={{ marginLeft: "12px" }}>{new Date(req.created_at).toLocaleString()}</span>
+                                        </div>
+                                    </div>
+                                    {req.status === "pending" && (
+                                        <div style={{ display: "flex", gap: "8px" }}>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleUpdateCollabStatus(req.id, "accept")}
+                                                className="button button--primary"
+                                                style={{ minHeight: "36px", padding: "6px 12px", fontSize: "0.85rem", background: "var(--success)", color: "white" }}
+                                            >
+                                                Accept
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleUpdateCollabStatus(req.id, "reject")}
+                                                className="button button--secondary"
+                                                style={{ minHeight: "36px", padding: "6px 12px", fontSize: "0.85rem", background: "#fecaca", color: "#b91c1c", borderColor: "#fecaca" }}
+                                            >
+                                                Reject
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            )}
 
             <section className="details-remix-tree" style={{ marginTop: 24 }}>
                 <RemixTree ideaId={idea.id} />
@@ -542,6 +733,71 @@ function IdeaDetails() {
                     ))}
                 </div>
             </section>
+
+            {/* Collaboration Request Modal */}
+            {showCollabModal && (
+                <div className="modal-overlay" onClick={() => setShowCollabModal(false)}>
+                    <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h3 style={{ margin: 0 }}>🤝 Request Collaboration</h3>
+                            <button
+                                type="button"
+                                className="modal-close-button"
+                                onClick={() => setShowCollabModal(false)}
+                            >
+                                &times;
+                            </button>
+                        </div>
+                        
+                        <form onSubmit={handleSendCollabRequest} className="form">
+                            <div className="form__field">
+                                <label className="form__label" htmlFor="collab-message">
+                                    Message
+                                </label>
+                                <textarea
+                                    id="collab-message"
+                                    className="textarea"
+                                    placeholder="Write a message to the idea owner..."
+                                    value={collabMessage}
+                                    onChange={(e) => setCollabMessage(e.target.value)}
+                                    required
+                                    style={{ minHeight: "120px" }}
+                                />
+                            </div>
+
+                            {collabError && (
+                                <p style={{ color: "var(--danger)", margin: 0, fontSize: "0.9rem" }}>
+                                    ⚠️ {collabError}
+                                </p>
+                            )}
+
+                            {collabSuccess && (
+                                <p style={{ color: "var(--success)", margin: 0, fontSize: "0.9rem", fontWeight: "bold" }}>
+                                    ✅ Collaboration request sent successfully!
+                                </p>
+                            )}
+
+                            <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px", marginTop: "8px" }}>
+                                <button
+                                    type="button"
+                                    className="button button--secondary"
+                                    onClick={() => setShowCollabModal(false)}
+                                    disabled={collabLoading}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="button button--primary"
+                                    disabled={collabLoading}
+                                >
+                                    {collabLoading ? "Sending..." : "Send Request"}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </AppLayout>
     );
 }
