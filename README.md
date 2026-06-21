@@ -1,147 +1,210 @@
-#  IdeaForge
+# IdeaForge
 
-IdeaForge is a full-stack collaborative innovation platform where users can share ideas, discover community-driven solutions, and contribute to the growth of existing concepts.
+IdeaForge is a full-stack collaborative innovation platform where users can share ideas, discover emerging concepts, receive AI-powered feedback, remix existing ideas, and collaborate with other creators to transform ideas into meaningful projects.
 
-The platform is designed to transform raw ideas into meaningful projects by enabling discussion, engagement, and collaboration among creators.
-
----
-
-## 🌐 Live Demo
-
-**Frontend:** https://ideafor.netlify.app
-
-**Backend API:** https://idea-forge-l7b1.onrender.com
-
-**API Documentation:** https://idea-forge-l7b1.onrender.com/docs
+The platform is designed to bridge the gap between inspiration and execution by providing tools for idea validation, community engagement, and collaborative development.
 
 ---
 
-## ✨ Features
+## Live Demo
 
-###  Authentication
+Frontend: https://ideafor.netlify.app
 
-- User Registration
-- Secure Login with JWT Authentication
-- Protected Routes
-- Session Management
-- Logout Functionality
+Backend API: https://idea-forge-l7b1.onrender.com
 
-###  Idea Management
-
-- Create Ideas
-- Browse Public Feed
-- View Detailed Idea Pages
-- Trending Ideas Section
-- Idea Discovery System
-
-###  Community Features
-
-- Like Ideas
-- Comment on Ideas
-- Bookmark Ideas
-- Follow Users
-- Notifications System
-
-###  User Profiles
-
-- Personalized User Profiles
-- Update Profile Information
-- User Bio Support
-- View User Contributions
+API Documentation: https://idea-forge-l7b1.onrender.com/docs
 
 ---
 
-## 🛠️ Tech Stack
+## Key Features
+
+### Authentication & Security
+
+* User Registration and Login
+* JWT-based Authentication
+* Protected Routes
+* Session Management
+* Secure Password Hashing
+* Role-based Access Controls
+
+### Idea Management
+
+* Create and Publish Ideas
+* Edit Existing Ideas
+* Delete Ideas
+* Public Idea Feed
+* Detailed Idea Pages
+* Trending Ideas
+* Idea Status Tracking
+* Bookmark Ideas
+
+### Community & Social Features
+
+* Like Ideas
+* Comment on Ideas
+* Follow Users
+* Real-time Notification System
+* Personalized Feeds
+* User Discovery
+
+### Remix System
+
+* Remix Existing Ideas
+* Parent-Child Idea Relationships
+* Remix Lineage Tracking
+* Interactive Remix Tree Visualization
+* Idea Evolution Mapping
+
+### Collaboration System
+
+* Collaboration Requests
+* Contributor Management
+* Request Approval Workflow
+* Public Collaborator Profiles
+* Team Formation Around Ideas
+
+### AI-Powered Features
+
+* AI Idea Reviews
+* Strength & Weakness Analysis
+* Target Audience Identification
+* MVP Recommendations
+* Monetization Suggestions
+* Groq-powered AI Integration
+
+### User Profiles & Analytics
+
+* Custom User Profiles
+* Bio and Profile Information
+* Profile Picture Support
+* User Contributions
+* Creator Analytics Dashboard
+* Most Popular Idea Insights
+* Follower and Engagement Metrics
+
+### User Experience
+
+* Neo-Brutalist Design System
+* Responsive Interface
+* Skeleton Loading States
+* Meaningful Empty States
+* Optimized API Performance
+* Modern Content-Focused UI
+
+---
+
+## Technology Stack
 
 ### Frontend
 
-- React
-- Vite
-- React Router DOM
-- Axios
-- JavaScript
-- CSS
+* React
+* Vite
+* React Router DOM
+* Axios
+* JavaScript
+* CSS
 
 ### Backend
 
-- FastAPI
-- SQLAlchemy
-- PostgreSQL
-- Pydantic
-- JWT Authentication
-- Passlib (Password Hashing)
+* FastAPI
+* SQLAlchemy
+* PostgreSQL
+* Pydantic
+* JWT Authentication
+* Passlib
+
+### AI
+
+* Groq API
+* LLM-powered Idea Analysis
 
 ### Database & Deployment
 
-- PostgreSQL (Neon)
-- Render (Backend Deployment)
-- Netlify (Frontend Deployment)
+* PostgreSQL (Neon)
+* Render
+* Netlify
 
 ---
 
-## 🏗️ Project Structure
+## Project Structure
 
 ```text
 IdeaForge/
 │
 ├── backend/
 │   ├── app/
-│   ├── routes/
-│   ├── models/
-│   ├── schemas/
-│   └── database/
+│   │   ├── routes/
+│   │   ├── models/
+│   │   ├── schemas/
+│   │   ├── services/
+│   │   └── database/
+│   │
+│   └── requirements.txt
 │
 ├── frontend/
 │   ├── src/
-│   ├── components/
-│   ├── pages/
-│   ├── services/
-│   └── styles/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   └── styles/
+│   │
+│   └── package.json
 │
 └── README.md
 ```
 
 ---
 
-## ⚙️ Backend Setup
+## Backend Setup
 
-### 1. Navigate to Backend
+### Clone the Repository
+
+```bash
+git clone <repository-url>
+cd IdeaForge
+```
+
+### Navigate to Backend
 
 ```bash
 cd backend
 ```
 
-### 2. Create Virtual Environment
+### Create Virtual Environment
 
-#### Windows
+Windows:
 
 ```bash
 python -m venv venv
 venv\Scripts\activate
 ```
 
-#### Mac/Linux
+macOS/Linux:
 
 ```bash
 python3 -m venv venv
 source venv/bin/activate
 ```
 
-### 3. Install Dependencies
+### Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Configure Environment Variables
+### Configure Environment Variables
 
 Create a `.env` file:
 
 ```env
-DATABASE_URL=your_database_connection_string
+DATABASE_URL=your_database_url
+SECRET_KEY=your_secret_key
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+GROQ_API_KEY=your_groq_api_key
 ```
 
-### 5. Run Backend Server
+### Run Backend
 
 ```bash
 uvicorn app.main:app --reload
@@ -153,7 +216,7 @@ Backend:
 http://127.0.0.1:8000
 ```
 
-Swagger Docs:
+Documentation:
 
 ```text
 http://127.0.0.1:8000/docs
@@ -161,21 +224,21 @@ http://127.0.0.1:8000/docs
 
 ---
 
-## 💻 Frontend Setup
+## Frontend Setup
 
-### 1. Navigate to Frontend
+### Navigate to Frontend
 
 ```bash
 cd frontend
 ```
 
-### 2. Install Dependencies
+### Install Dependencies
 
 ```bash
 npm install
 ```
 
-### 3. Start Development Server
+### Start Development Server
 
 ```bash
 npm run dev
@@ -189,92 +252,92 @@ http://localhost:5173
 
 ---
 
-## 🔗 API Integration
+## Database Design
 
-IdeaForge uses Axios to communicate with the FastAPI backend.
+Core entities include:
 
-Authentication is handled through JWT access tokens stored in the browser and attached to authenticated API requests.
+* Users
+* Ideas
+* Tags
+* Comments
+* Likes
+* Bookmarks
+* Notifications
+* Follows
+* Collaboration Requests
+* AI Reviews
 
----
-
-## 🗄️ Database Design
-
-The application uses PostgreSQL with SQLAlchemy ORM.
-
-### Core Entities
-
-- Users
-- Ideas
-- Comments
-- Likes
-- Bookmarks
-- Notifications
-- Follows
-
-The schema is designed using relational database principles to support social interactions and idea collaboration.
+The database schema is designed around relational data modeling to support social interactions, idea evolution, collaboration workflows, and AI-assisted innovation.
 
 ---
 
-## ✅ Current Functionality
+## Current Functionality
 
-- JWT Authentication
-- User Registration & Login
-- Public Idea Feed
-- Trending Ideas
-- Create Idea
-- Idea Details Page
-- Likes System
-- Comments System
-- Bookmarks
-- Follow Users
-- Notifications
-- User Profiles
-- Protected Routes
-- Full Deployment Pipeline
-
----
-
-## 🚀 Future Roadmap
-
-### AI Features
-
-- AI-Powered Idea Summaries
-- Semantic Idea Search
-- Idea Similarity Detection
-
-### Collaboration Features
-
-- Real-Time Notifications
-- Idea Collaboration Rooms
-- Team-Based Idea Development
-- Idea Branching System
-
-### Platform Improvements
-
-- Contributor Reputation System
-- Innovation Graph Visualization
-- Dark / Light Theme
-- Enhanced Mobile Experience
+* JWT Authentication
+* User Registration & Login
+* Public Feed
+* Idea Creation & Editing
+* Idea Status Tracking
+* Trending Ideas
+* Likes & Comments
+* Bookmarks
+* Follow System
+* Notifications
+* User Profiles
+* Creator Analytics
+* Remix System
+* Remix Tree Visualization
+* Collaboration Requests
+* AI Idea Reviews
+* Protected Routes
+* Full Deployment Pipeline
 
 ---
 
+## Roadmap
 
-## 🧠 Inspiration
+### AI Enhancements
 
-Many great ideas are lost because they are never shared, discussed, or improved collaboratively.
+* Idea Similarity Detection
+* AI Remix Suggestions
+* Semantic Idea Search
+* AI-generated Idea Summaries
 
-IdeaForge was built to provide a space where creators can publish ideas, receive feedback, discover opportunities, and work together to turn concepts into reality.
+### Collaboration Enhancements
+
+* Real-time Collaboration Updates
+* Project Workspaces
+* Team Communication Features
+* Contributor Reputation System
+
+### Platform Growth
+
+* Innovation Graph Visualization
+* Advanced Search & Discovery
+* Mobile Experience Improvements
+* Theme Customization
+* Recommendation Engine
 
 ---
 
-## 📜 License
+## Inspiration
+
+Many promising ideas never progress beyond initial thoughts because they lack feedback, visibility, or the right collaborators.
+
+IdeaForge was built to provide a platform where ideas can be shared, improved, validated, and developed collaboratively through community participation and AI-assisted guidance.
+
+The goal is to help creators move from concept to execution by combining social collaboration, intelligent feedback, and idea evolution into a single platform.
+
+---
+
+## License
 
 This project is licensed under the MIT License.
 
 ---
 
-## 👨‍💻 Author
+## Author
 
-**Sushanth**
+Sushanth
 
-Building AI, software engineering, and innovation-focused projects.
+Software Engineering • AI • Full-Stack Development • Innovation Systems
