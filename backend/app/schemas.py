@@ -220,3 +220,16 @@ class CollaborationRequestResponse(BaseModel):
 	idea: SimpleIdeaResponse | None = None
 
 	model_config = ConfigDict(from_attributes=True)
+
+
+class RemixSuggestion(BaseModel):
+	title: str
+	description: str
+
+	model_config = ConfigDict(from_attributes=True)
+
+
+class RemixSuggestionsResponse(BaseModel):
+	suggestions: list[RemixSuggestion]
+
+	model_config = ConfigDict(from_attributes=True)
