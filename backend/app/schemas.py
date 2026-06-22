@@ -232,4 +232,10 @@ class RemixSuggestion(BaseModel):
 class RemixSuggestionsResponse(BaseModel):
 	suggestions: list[RemixSuggestion]
 
-	model_config = ConfigDict(from_attributes=True)
+	model_config = ConfigDict(from_attributes=True)
+
+
+class RemixCreate(BaseModel):
+	title: str | None = None
+	description: str | None = None
+

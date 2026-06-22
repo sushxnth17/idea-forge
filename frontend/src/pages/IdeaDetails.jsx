@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import AppLayout from "../components/AppLayout";
 import StatusBadge from "../components/StatusBadge";
@@ -79,6 +79,7 @@ function formatMarkdownText(text) {
 function IdeaDetails() {
 
     const { id } = useParams();
+    const navigate = useNavigate();
 
     const [idea, setIdea] = useState(null);
     const [comment, setComment] = useState("");
@@ -93,6 +94,13 @@ function IdeaDetails() {
     const [remixSuggestions, setRemixSuggestions] = useState(null);
     const [remixLoading, setRemixLoading] = useState(false);
     const [remixError, setRemixError] = useState(null);
+
+    // Remix Creation Modal State
+    const [showRemixModal, setShowRemixModal] = useState(false);
+    const [remixModalTitle, setRemixModalTitle] = useState("");
+    const [remixModalDescription, setRemixModalDescription] = useState("");
+    const [remixSubmitLoading, setRemixSubmitLoading] = useState(false);
+    const [remixSubmitError, setRemixSubmitError] = useState(null);
 
     // Collaboration Request State
     const [collabRequests, setCollabRequests] = useState([]);
@@ -146,6 +154,33 @@ function IdeaDetails() {
             setRemixError(error.response?.data?.detail || "Could not generate remix suggestions.");
         } finally {
             setRemixLoading(false);
+        }
+    }
+
+    function handleOpenRemixModal(suggestion) {
+        setRemixModalTitle(suggestion.title);
+        setRemixModalDescription(suggestion.description);
+        setRemixSubmitError(null);
+        setShowRemixModal(true);
+    }
+
+    async function handleCreateCustomRemix(e) {
+        e.preventDefault();
+        setRemixSubmitLoading(true);
+        setRemixSubmitError(null);
+        try {
+            const response = await api.post(`/ideas/${id}/remix`, {
+                title: remixModalTitle,
+                description: remixModalDescription
+            });
+            setShowRemixModal(false);
+            alert("Remix created successfully!");
+            navigate(`/ideas/${response.data.id}`);
+        } catch (error) {
+            console.log("Error creating remix:", error);
+            setRemixSubmitError(error.response?.data?.detail || "Could not create remix.");
+        } finally {
+            setRemixSubmitLoading(false);
         }
     }
 
@@ -795,6 +830,14 @@ function IdeaDetails() {
                                                 </h4>
                                                 <p style={{ margin: 0, fontSize: "0.95rem", lineHeight: "1.5" }}>{formatMarkdownText(suggestion.description)}</p>
                                             </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleOpenRemixModal(suggestion)}
+                                                className="button button--secondary button--full"
+                                                style={{ marginTop: "16px", justifyContent: "center" }}
+                                            >
+                                                Create Remix
+                                            </button>
                                         </div>
                                     ))}
                                 </div>
@@ -922,6 +965,78 @@ function IdeaDetails() {
                                     disabled={collabLoading}
                                 >
                                     {collabLoading ? "Sending..." : "Send Request"}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Remix Creation Modal */}
+            {showRemixModal && (
+                <div className="modal-overlay" onClick={() => setShowRemixModal(false)}>
+                    <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h3 style={{ margin: 0 }}>🔁 Create Remix from Suggestion</h3>
+                            <button
+                                type="button"
+                                className="modal-close-button"
+                                onClick={() => setShowRemixModal(false)}
+                            >
+                                &times;
+                            </button>
+                        </div>
+                        
+                        <form onSubmit={handleCreateCustomRemix} className="form">
+                            <div className="form__field">
+                                <label className="form__label" htmlFor="remix-title">
+                                    Remix Title
+                                </label>
+                                <input
+                                    id="remix-title"
+                                    type="text"
+                                    className="input"
+                                    value={remixModalTitle}
+                                    onChange={(e) => setRemixModalTitle(e.target.value)}
+                                    required
+                                />
+                            </div>
+
+                            <div className="form__field">
+                                <label className="form__label" htmlFor="remix-description">
+                                    Remix Description
+                                </label>
+                                <textarea
+                                    id="remix-description"
+                                    className="textarea"
+                                    value={remixModalDescription}
+                                    onChange={(e) => setRemixModalDescription(e.target.value)}
+                                    required
+                                    style={{ minHeight: "150px" }}
+                                />
+                            </div>
+
+                            {remixSubmitError && (
+                                <p style={{ color: "var(--danger)", margin: 0, fontSize: "0.9rem" }}>
+                                    ⚠️ {remixSubmitError}
+                                </p>
+                            )}
+
+                            <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px", marginTop: "8px" }}>
+                                <button
+                                    type="button"
+                                    className="button button--secondary"
+                                    onClick={() => setShowRemixModal(false)}
+                                    disabled={remixSubmitLoading}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="button button--primary"
+                                    disabled={remixSubmitLoading}
+                                >
+                                    {remixSubmitLoading ? "Creating..." : "Create Remix"}
                                 </button>
                             </div>
                         </form>

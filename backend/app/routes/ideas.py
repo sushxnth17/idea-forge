@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Body
 from sqlalchemy.orm import Session, joinedload, selectinload
 from sqlalchemy import or_, func
 from ..auth import get_current_user
 from ..database import get_db
 from ..models import (Idea, User, Tag, Like, Comment, Bookmark, Notification, Follow, AIReview, CollaborationRequest)
-from ..schemas import (IdeaCreate, IdeaResponse, CommentCreate, CommentResponse, BookmarkResponse, TagResponse, IdeaRemixTreeResponse, AIReviewResponse, CollaborationRequestCreate, CollaborationRequestResponse, RemixSuggestionsResponse)
+from ..schemas import (IdeaCreate, IdeaResponse, CommentCreate, CommentResponse, BookmarkResponse, TagResponse, IdeaRemixTreeResponse, AIReviewResponse, CollaborationRequestCreate, CollaborationRequestResponse, RemixSuggestionsResponse, RemixCreate)
 from ..services.ai_service import generate_idea_review, generate_remix_suggestions
 
 
@@ -329,6 +329,7 @@ def create_comment(
 )
 def remix_idea(
 	idea_id: int,
+	remix_data: RemixCreate | None = Body(default=None),
 	current_user: User = Depends(get_current_user),
 	db: Session = Depends(get_db),
 ):
@@ -344,9 +345,13 @@ def remix_idea(
 			detail="Idea not found"
 		)
 
+	# Use custom title and description if provided in request body
+	title = remix_data.title if (remix_data and remix_data.title is not None) else f"{original_idea.title} (Remix)"
+	description = remix_data.description if (remix_data and remix_data.description is not None) else original_idea.description
+
 	new_idea = Idea(
-		title=f"{original_idea.title} (Remix)",
-		description=original_idea.description,
+		title=title,
+		description=description,
 		is_public=True,
 		owner_id=current_user.id,
 		parent_idea_id=original_idea.id
