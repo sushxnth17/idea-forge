@@ -135,6 +135,14 @@ function IdeaDetails() {
         try {
             const response = await api.post(`/ideas/${id}/ai-review`);
             setAiReview(response.data);
+            
+            // Automatically scroll to the AI review section once loaded
+            setTimeout(() => {
+                const element = document.querySelector(".details-ai-review");
+                if (element) {
+                    element.scrollIntoView({ behavior: "smooth" });
+                }
+            }, 100);
         } catch (error) {
             console.log("Error generating AI review:", error);
             setAiError(error.response?.data?.detail || "Could not generate AI review.");
@@ -149,6 +157,14 @@ function IdeaDetails() {
         try {
             const response = await api.post(`/ideas/${id}/remix-suggestions`);
             setRemixSuggestions(response.data.suggestions);
+            
+            // Automatically scroll to the suggestions section once loaded
+            setTimeout(() => {
+                const element = document.querySelector(".details-remix-suggestions");
+                if (element) {
+                    element.scrollIntoView({ behavior: "smooth" });
+                }
+            }, 100);
         } catch (error) {
             console.log("Error generating remix suggestions:", error);
             setRemixError(error.response?.data?.detail || "Could not generate remix suggestions.");
