@@ -1,11 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Body
 from sqlalchemy.orm import Session, joinedload, selectinload
 from sqlalchemy import or_, func
 from ..auth import get_current_user
 from ..database import get_db
 from ..models import (Idea, User, Tag, Like, Comment, Bookmark, Notification, Follow, AIReview, CollaborationRequest)
-from ..schemas import (IdeaCreate, IdeaResponse, CommentCreate, CommentResponse, BookmarkResponse, TagResponse, IdeaRemixTreeResponse, AIReviewResponse, CollaborationRequestCreate, CollaborationRequestResponse)
-from ..services.ai_service import generate_idea_review
+from ..schemas import (IdeaCreate, IdeaResponse, CommentCreate, CommentResponse, BookmarkResponse, TagResponse, IdeaRemixTreeResponse, AIReviewResponse, CollaborationRequestCreate, CollaborationRequestResponse, RemixSuggestionsResponse, RemixCreate)
+from ..services.ai_service import generate_idea_review, generate_remix_suggestions
 
 
 router = APIRouter()
@@ -329,6 +329,7 @@ def create_comment(
 )
 def remix_idea(
 	idea_id: int,
+	remix_data: RemixCreate | None = Body(default=None),
 	current_user: User = Depends(get_current_user),
 	db: Session = Depends(get_db),
 ):
@@ -344,9 +345,13 @@ def remix_idea(
 			detail="Idea not found"
 		)
 
+	# Use custom title and description if provided in request body
+	title = remix_data.title if (remix_data and remix_data.title is not None) else f"{original_idea.title} (Remix)"
+	description = remix_data.description if (remix_data and remix_data.description is not None) else original_idea.description
+
 	new_idea = Idea(
-		title=f"{original_idea.title} (Remix)",
-		description=original_idea.description,
+		title=title,
+		description=description,
 		is_public=True,
 		owner_id=current_user.id,
 		parent_idea_id=original_idea.id
@@ -726,6 +731,52 @@ def get_ai_review(
 		)
 
 	return review
+
+
+@router.post(
+	"/ideas/{idea_id}/remix-suggestions",
+	response_model=RemixSuggestionsResponse,
+	status_code=status.HTTP_200_OK
+)
+async def get_remix_suggestions_endpoint(
+	idea_id: int,
+	current_user: User = Depends(get_current_user),
+	db: Session = Depends(get_db),
+):
+	idea = (
+		db.query(Idea)
+		.filter(Idea.id == idea_id)
+		.first()
+	)
+
+	if idea is None:
+		raise HTTPException(
+			status_code=status.HTTP_404_NOT_FOUND,
+			detail="Idea not found"
+		)
+
+	# Access control: Must be owner of the idea, OR the idea must be public
+	if not idea.is_public and idea.owner_id != current_user.id:
+		raise HTTPException(
+			status_code=status.HTTP_403_FORBIDDEN,
+			detail="You do not have permission to access this idea"
+		)
+
+	try:
+		suggestions = await generate_remix_suggestions(idea.title, idea.description)
+	except ValueError as e:
+		raise HTTPException(
+			status_code=status.HTTP_400_BAD_REQUEST,
+			detail=str(e)
+		)
+	except Exception as e:
+		raise HTTPException(
+			status_code=status.HTTP_502_BAD_GATEWAY,
+			detail=str(e)
+		)
+
+	return {"suggestions": suggestions}
+
 
 
 @router.post(

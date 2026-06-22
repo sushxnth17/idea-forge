@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import AppLayout from "../components/AppLayout";
 import StatusBadge from "../components/StatusBadge";
@@ -79,6 +79,7 @@ function formatMarkdownText(text) {
 function IdeaDetails() {
 
     const { id } = useParams();
+    const navigate = useNavigate();
 
     const [idea, setIdea] = useState(null);
     const [comment, setComment] = useState("");
@@ -88,6 +89,18 @@ function IdeaDetails() {
     const [aiReview, setAiReview] = useState(null);
     const [isGenerating, setIsGenerating] = useState(false);
     const [aiError, setAiError] = useState(null);
+
+    // AI Remix Suggestions State
+    const [remixSuggestions, setRemixSuggestions] = useState(null);
+    const [remixLoading, setRemixLoading] = useState(false);
+    const [remixError, setRemixError] = useState(null);
+
+    // Remix Creation Modal State
+    const [showRemixModal, setShowRemixModal] = useState(false);
+    const [remixModalTitle, setRemixModalTitle] = useState("");
+    const [remixModalDescription, setRemixModalDescription] = useState("");
+    const [remixSubmitLoading, setRemixSubmitLoading] = useState(false);
+    const [remixSubmitError, setRemixSubmitError] = useState(null);
 
     // Collaboration Request State
     const [collabRequests, setCollabRequests] = useState([]);
@@ -122,11 +135,68 @@ function IdeaDetails() {
         try {
             const response = await api.post(`/ideas/${id}/ai-review`);
             setAiReview(response.data);
+            
+            // Automatically scroll to the AI review section once loaded
+            setTimeout(() => {
+                const element = document.querySelector(".details-ai-review");
+                if (element) {
+                    element.scrollIntoView({ behavior: "smooth" });
+                }
+            }, 100);
         } catch (error) {
             console.log("Error generating AI review:", error);
             setAiError(error.response?.data?.detail || "Could not generate AI review.");
         } finally {
             setIsGenerating(false);
+        }
+    }
+
+    async function handleGenerateRemixSuggestions() {
+        setRemixLoading(true);
+        setRemixError(null);
+        try {
+            const response = await api.post(`/ideas/${id}/remix-suggestions`);
+            setRemixSuggestions(response.data.suggestions);
+            
+            // Automatically scroll to the suggestions section once loaded
+            setTimeout(() => {
+                const element = document.querySelector(".details-remix-suggestions");
+                if (element) {
+                    element.scrollIntoView({ behavior: "smooth" });
+                }
+            }, 100);
+        } catch (error) {
+            console.log("Error generating remix suggestions:", error);
+            setRemixError(error.response?.data?.detail || "Could not generate remix suggestions.");
+        } finally {
+            setRemixLoading(false);
+        }
+    }
+
+    function handleOpenRemixModal(suggestion) {
+        setRemixModalTitle(suggestion.title);
+        setRemixModalDescription(suggestion.description);
+        setRemixSubmitError(null);
+        setShowRemixModal(true);
+    }
+
+    async function handleCreateCustomRemix(e) {
+        e.preventDefault();
+        setRemixSubmitLoading(true);
+        setRemixSubmitError(null);
+        try {
+            const response = await api.post(`/ideas/${id}/remix`, {
+                title: remixModalTitle,
+                description: remixModalDescription
+            });
+            setShowRemixModal(false);
+            alert("Remix created successfully!");
+            navigate(`/ideas/${response.data.id}`);
+        } catch (error) {
+            console.log("Error creating remix:", error);
+            setRemixSubmitError(error.response?.data?.detail || "Could not create remix.");
+        } finally {
+            setRemixSubmitLoading(false);
         }
     }
 
@@ -399,6 +469,18 @@ function IdeaDetails() {
                                         ✏️ Edit Idea
                                     </Link>
                                 </>
+                            )}
+
+                            {currentUser && (idea.is_public || idea.owner_id === currentUser.id) && (
+                                <button
+                                    type="button"
+                                    onClick={handleGenerateRemixSuggestions}
+                                    className="button button--primary button--full"
+                                    disabled={remixLoading}
+                                    style={{ marginTop: 12, width: "100%", justifyContent: "center" }}
+                                >
+                                    {remixLoading ? "Suggesting..." : "✨ Suggest Remixes"}
+                                </button>
                             )}
                         </div>
 
@@ -689,6 +771,113 @@ function IdeaDetails() {
                 </section>
             )}
 
+            {currentUser && (idea.is_public || idea.owner_id === currentUser.id) && (
+                <section className="details-remix-suggestions" style={{ marginTop: 24 }}>
+                    <div className="card">
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px", marginBottom: "16px" }}>
+                            <h3 style={{ margin: 0, fontSize: "1.25rem", display: "flex", alignItems: "center", gap: "8px" }}>
+                                💡 AI Remix Suggestions
+                            </h3>
+                            {remixSuggestions && remixSuggestions.length > 0 && (
+                                <button
+                                    type="button"
+                                    onClick={handleGenerateRemixSuggestions}
+                                    className="button button--secondary"
+                                    disabled={remixLoading}
+                                    style={{ padding: "6px 12px", minHeight: "36px", fontSize: "0.85rem" }}
+                                >
+                                    {remixLoading ? "Regenerating..." : "🔄 Regenerate"}
+                                </button>
+                            )}
+                        </div>
+
+                        {/* Error State */}
+                        {remixError && (
+                            <div className="card" style={{ background: "#fecaca", borderColor: "#ef4444", padding: "16px", marginBottom: "16px" }}>
+                                <p style={{ color: "#b91c1c", fontWeight: "bold", margin: 0 }}>⚠️ Error fetching Remix Suggestions</p>
+                                <p style={{ color: "#b91c1c", fontSize: "0.9rem", marginTop: "4px" }}>{remixError}</p>
+                                <button
+                                    type="button"
+                                    onClick={handleGenerateRemixSuggestions}
+                                    className="button button--primary"
+                                    style={{ marginTop: "12px" }}
+                                >
+                                    Retry
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Loading State */}
+                        {remixLoading && (
+                            <div style={{ textAlign: "center", padding: "40px 20px" }}>
+                                <div className="loading-spinner" style={{ fontSize: "2rem", marginBottom: "12px", display: "inline-block", animation: "spin 2s linear infinite" }}>✨</div>
+                                <h4>Generating remix suggestions...</h4>
+                                <p className="muted">Brainstorming 5 distinct, implementation-oriented pivots and technical adaptations for your idea.</p>
+                            </div>
+                        )}
+
+                        {/* Empty / Initial State */}
+                        {!remixSuggestions && !remixLoading && !remixError && (
+                            <div style={{ textAlign: "center", padding: "30px 20px" }}>
+                                <p className="muted" style={{ marginBottom: "16px" }}>
+                                    Generate 5 distinct, realistic, and implementation-oriented remix suggestions for this startup idea.
+                                </p>
+                                <button
+                                    type="button"
+                                    onClick={handleGenerateRemixSuggestions}
+                                    className="button button--primary"
+                                    style={{ display: "inline-flex" }}
+                                >
+                                    ✨ Suggest Remixes
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Loaded Content State */}
+                        {remixSuggestions && remixSuggestions.length > 0 && !remixLoading && !remixError && (
+                            <div className="remix-suggestions-content" style={{ display: "grid", gap: "16px" }}>
+                                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px" }}>
+                                    {remixSuggestions.map((suggestion, idx) => (
+                                        <div key={idx} className="card panel" style={{ padding: "20px", background: "var(--surface-soft)", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                                            <div>
+                                                <h4 style={{ color: "#000000", marginBottom: "10px", fontSize: "1.1rem", display: "flex", alignItems: "center", gap: "8px" }}>
+                                                    <span className="badge" style={{ padding: "2px 8px", fontSize: "0.8rem", borderRadius: "8px" }}>#{idx + 1}</span>
+                                                    {suggestion.title}
+                                                </h4>
+                                                <p style={{ margin: 0, fontSize: "0.95rem", lineHeight: "1.5" }}>{formatMarkdownText(suggestion.description)}</p>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleOpenRemixModal(suggestion)}
+                                                className="button button--secondary button--full"
+                                                style={{ marginTop: "16px", justifyContent: "center" }}
+                                            >
+                                                Create Remix
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Empty results state */}
+                        {remixSuggestions && remixSuggestions.length === 0 && !remixLoading && !remixError && (
+                            <div style={{ textAlign: "center", padding: "30px 20px" }}>
+                                <p className="muted">No suggestions were generated. Please try again.</p>
+                                <button
+                                    type="button"
+                                    onClick={handleGenerateRemixSuggestions}
+                                    className="button button--primary"
+                                    style={{ marginTop: "12px" }}
+                                >
+                                    Try Again
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </section>
+            )}
+
             <section className="details-remix-tree" style={{ marginTop: 24 }}>
                 <RemixTree ideaId={idea.id} />
             </section>
@@ -792,6 +981,78 @@ function IdeaDetails() {
                                     disabled={collabLoading}
                                 >
                                     {collabLoading ? "Sending..." : "Send Request"}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Remix Creation Modal */}
+            {showRemixModal && (
+                <div className="modal-overlay" onClick={() => setShowRemixModal(false)}>
+                    <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h3 style={{ margin: 0 }}>🔁 Create Remix from Suggestion</h3>
+                            <button
+                                type="button"
+                                className="modal-close-button"
+                                onClick={() => setShowRemixModal(false)}
+                            >
+                                &times;
+                            </button>
+                        </div>
+                        
+                        <form onSubmit={handleCreateCustomRemix} className="form">
+                            <div className="form__field">
+                                <label className="form__label" htmlFor="remix-title">
+                                    Remix Title
+                                </label>
+                                <input
+                                    id="remix-title"
+                                    type="text"
+                                    className="input"
+                                    value={remixModalTitle}
+                                    onChange={(e) => setRemixModalTitle(e.target.value)}
+                                    required
+                                />
+                            </div>
+
+                            <div className="form__field">
+                                <label className="form__label" htmlFor="remix-description">
+                                    Remix Description
+                                </label>
+                                <textarea
+                                    id="remix-description"
+                                    className="textarea"
+                                    value={remixModalDescription}
+                                    onChange={(e) => setRemixModalDescription(e.target.value)}
+                                    required
+                                    style={{ minHeight: "150px" }}
+                                />
+                            </div>
+
+                            {remixSubmitError && (
+                                <p style={{ color: "var(--danger)", margin: 0, fontSize: "0.9rem" }}>
+                                    ⚠️ {remixSubmitError}
+                                </p>
+                            )}
+
+                            <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px", marginTop: "8px" }}>
+                                <button
+                                    type="button"
+                                    className="button button--secondary"
+                                    onClick={() => setShowRemixModal(false)}
+                                    disabled={remixSubmitLoading}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="button button--primary"
+                                    disabled={remixSubmitLoading}
+                                >
+                                    {remixSubmitLoading ? "Creating..." : "Create Remix"}
                                 </button>
                             </div>
                         </form>
