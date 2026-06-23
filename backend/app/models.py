@@ -48,6 +48,7 @@ class Idea(Base):
 	comments = relationship("Comment",back_populates="idea",cascade="all, delete-orphan")
 	bookmarks = relationship("Bookmark",back_populates="idea",cascade="all, delete-orphan")
 	ai_reviews = relationship("AIReview", back_populates="idea", cascade="all, delete-orphan")
+	remix_suggestions = relationship("RemixSuggestion", back_populates="idea", cascade="all, delete-orphan")
 	collaboration_requests = relationship("CollaborationRequest", back_populates="idea", cascade="all, delete-orphan")
 
 	@property
@@ -267,6 +268,44 @@ class AIReview(Base):
 	idea = relationship(
 		"Idea",
 		back_populates="ai_reviews"
+	)
+
+
+class RemixSuggestion(Base):
+	__tablename__ = "remix_suggestions"
+
+	id = Column(
+		Integer,
+		primary_key=True,
+		index=True
+	)
+
+	idea_id = Column(
+		Integer,
+		ForeignKey("ideas.id"),
+		index=True,
+		nullable=False
+	)
+
+	title = Column(
+		String,
+		nullable=False
+	)
+
+	description = Column(
+		Text,
+		nullable=False
+	)
+
+	created_at = Column(
+		DateTime(timezone=True),
+		server_default=func.now(),
+		nullable=False
+	)
+
+	idea = relationship(
+		"Idea",
+		back_populates="remix_suggestions"
 	)
 
 

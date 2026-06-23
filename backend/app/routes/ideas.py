@@ -3,10 +3,12 @@ from sqlalchemy.orm import Session, joinedload, selectinload
 from sqlalchemy import or_, func
 from ..auth import get_current_user
 from ..database import get_db
-from ..models import (Idea, User, Tag, Like, Comment, Bookmark, Notification, Follow, AIReview, CollaborationRequest)
+from ..models import (Idea, User, Tag, Like, Comment, Bookmark, Notification, Follow, AIReview, CollaborationRequest, RemixSuggestion)
 from ..schemas import (IdeaCreate, IdeaResponse, CommentCreate, CommentResponse, BookmarkResponse, TagResponse, IdeaRemixTreeResponse, AIReviewResponse, CollaborationRequestCreate, CollaborationRequestResponse, RemixSuggestionsResponse, RemixCreate)
 from ..services.ai_service import generate_idea_review, generate_remix_suggestions
 
+
+from ..cache import feed_cache, trending_cache, invalidate_feed_cache, invalidate_trending_cache
 
 router = APIRouter()
 
@@ -50,6 +52,7 @@ def create_idea(
 
 	db.add(new_idea)
 	db.commit()
+	invalidate_feed_cache()
 	db.refresh(new_idea)
 
 	return new_idea
@@ -158,6 +161,7 @@ def update_idea(
 		idea.tags.append(tag)
 
 	db.commit()
+	invalidate_feed_cache()
 	db.refresh(idea)
 
 	return idea
@@ -185,6 +189,7 @@ def delete_idea(
 
 	db.delete(idea)
 	db.commit()
+	invalidate_feed_cache()
 
 @router.get("/feed", response_model=list[IdeaResponse])
 def get_public_feed(
@@ -192,6 +197,13 @@ def get_public_feed(
 	limit: int = 5,
 	db: Session = Depends(get_db),
 ):
+	cache_key = (page, limit)
+
+	# 1. Check if the feed is already cached (Cache hit)
+	if cache_key in feed_cache:
+		return feed_cache[cache_key]
+
+	# 2. Cache miss: Query the database
 	skip = (page - 1) * limit
 
 	# [EAGER LOADING] Eagerly load relationships to resolve N+1 queries when loading the public feed list
@@ -210,7 +222,13 @@ def get_public_feed(
 		.all()
 	)
 
-	return public_ideas
+	# 3. Convert database models to Pydantic models to avoid DetachedInstanceError on subsequent cache hits
+	serialized_ideas = [IdeaResponse.model_validate(idea) for idea in public_ideas]
+
+	# 4. Store the serialized feed response in the TTLCache
+	feed_cache[cache_key] = serialized_ideas
+
+	return serialized_ideas
 
 @router.get("/search/{tag_name}", response_model=list[IdeaResponse])
 def search_by_tag(
@@ -280,6 +298,7 @@ def like_idea(
 
 		db.add(notification)
 	db.commit()
+	invalidate_trending_cache()
 
 	return {"message": "Idea liked successfully"}
 
@@ -318,6 +337,7 @@ def create_comment(
 		)
 		db.add(notification)
 	db.commit()
+	invalidate_trending_cache()
 	db.refresh(new_comment)
 
 	return new_comment
@@ -369,6 +389,7 @@ def remix_idea(
 
 		db.add(notification)
 	db.commit()
+	invalidate_trending_cache()
 	db.refresh(new_idea)
 
 	return new_idea
@@ -484,6 +505,13 @@ def get_following_feed(
 def get_trending_ideas(
 	db: Session = Depends(get_db),
 ):
+	cache_key = "trending"
+
+	# 1. Check if trending ideas are already cached (Cache hit)
+	if cache_key in trending_cache:
+		return trending_cache[cache_key]
+
+	# 2. Cache miss: Query the database
 	# [EAGER LOADING] Eagerly load owner, tags, likes, and comments to prevent N+1 query loops when calculating trending scores
 	ideas = (
 		db.query(Idea)
@@ -497,6 +525,7 @@ def get_trending_ideas(
 		.all()
 	)
 
+	# 3. Sort ideas based on calculated trending score
 	sorted_ideas = sorted(
 		ideas,
 		key=lambda idea:
@@ -506,7 +535,15 @@ def get_trending_ideas(
 		reverse=True
 	)
 
-	return sorted_ideas[:10]
+	top_ideas = sorted_ideas[:10]
+
+	# 4. Convert database models to Pydantic models to avoid DetachedInstanceError on subsequent cache hits
+	serialized_ideas = [IdeaResponse.model_validate(idea) for idea in top_ideas]
+
+	# 5. Store the serialized trending response in the TTLCache (Cache write)
+	trending_cache[cache_key] = serialized_ideas
+
+	return serialized_ideas
 
 @router.get(
     "/public/ideas/{idea_id}",
@@ -667,7 +704,19 @@ async def generate_ai_review(
 			detail="Idea not found"
 		)
 
-	# Generate review using AI service (calls Groq API)
+	# 1. Check if the idea already has an AI review stored in the database (Cache check)
+	existing_review = (
+		db.query(AIReview)
+		.filter(AIReview.idea_id == idea_id)
+		.order_by(AIReview.created_at.desc())
+		.first()
+	)
+
+	# 2. If review exists: Return existing review immediately and do not call Groq
+	if existing_review:
+		return existing_review
+
+	# 3. If review does not exist: Generate review using existing AI service
 	try:
 		review_text = await generate_idea_review(idea.title, idea.description)
 	except ValueError as e:
@@ -681,6 +730,7 @@ async def generate_ai_review(
 			detail=str(e)
 		)
 
+	# Save the newly generated review to the database
 	new_review = AIReview(
 		idea_id=idea_id,
 		review_text=review_text
@@ -762,6 +812,18 @@ async def get_remix_suggestions_endpoint(
 			detail="You do not have permission to access this idea"
 		)
 
+	# 1. Check if suggestions already exist in the database (Cache check)
+	cached_suggestions = (
+		db.query(RemixSuggestion)
+		.filter(RemixSuggestion.idea_id == idea_id)
+		.all()
+	)
+
+	# 2. If suggestions exist: Return cached suggestions immediately and do not call Groq
+	if cached_suggestions:
+		return {"suggestions": cached_suggestions}
+
+	# 3. If suggestions do not exist: Generate suggestions using existing service
 	try:
 		suggestions = await generate_remix_suggestions(idea.title, idea.description)
 	except ValueError as e:
@@ -775,7 +837,19 @@ async def get_remix_suggestions_endpoint(
 			detail=str(e)
 		)
 
-	return {"suggestions": suggestions}
+	# 4. Save newly generated suggestions to the database
+	db_suggestions = []
+	for item in suggestions:
+		db_suggestion = RemixSuggestion(
+			idea_id=idea_id,
+			title=item["title"],
+			description=item["description"]
+		)
+		db.add(db_suggestion)
+		db_suggestions.append(db_suggestion)
+	db.commit()
+
+	return {"suggestions": db_suggestions}
 
 
 
