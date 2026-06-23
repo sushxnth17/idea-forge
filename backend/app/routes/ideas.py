@@ -15,6 +15,9 @@ router = APIRouter()
 # Lightweight in-memory feed cache (TTL: 60 seconds, Cache Key: (page, limit))
 feed_cache = TTLCache(maxsize=128, ttl=60)
 
+# Lightweight in-memory trending ideas cache (TTL: 300 seconds, Cache Key: "trending")
+trending_cache = TTLCache(maxsize=1, ttl=300)
+
 
 @router.post("/ideas", response_model=IdeaResponse, status_code=status.HTTP_201_CREATED)
 def create_idea(
@@ -502,6 +505,13 @@ def get_following_feed(
 def get_trending_ideas(
 	db: Session = Depends(get_db),
 ):
+	cache_key = "trending"
+
+	# 1. Check if trending ideas are already cached (Cache hit)
+	if cache_key in trending_cache:
+		return trending_cache[cache_key]
+
+	# 2. Cache miss: Query the database
 	# [EAGER LOADING] Eagerly load owner, tags, likes, and comments to prevent N+1 query loops when calculating trending scores
 	ideas = (
 		db.query(Idea)
@@ -515,6 +525,7 @@ def get_trending_ideas(
 		.all()
 	)
 
+	# 3. Sort ideas based on calculated trending score
 	sorted_ideas = sorted(
 		ideas,
 		key=lambda idea:
@@ -524,7 +535,15 @@ def get_trending_ideas(
 		reverse=True
 	)
 
-	return sorted_ideas[:10]
+	top_ideas = sorted_ideas[:10]
+
+	# 4. Convert database models to Pydantic models to avoid DetachedInstanceError on subsequent cache hits
+	serialized_ideas = [IdeaResponse.model_validate(idea) for idea in top_ideas]
+
+	# 5. Store the serialized trending response in the TTLCache (Cache write)
+	trending_cache[cache_key] = serialized_ideas
+
+	return serialized_ideas
 
 @router.get(
     "/public/ideas/{idea_id}",
