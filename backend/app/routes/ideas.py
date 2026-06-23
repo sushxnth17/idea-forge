@@ -8,15 +8,9 @@ from ..schemas import (IdeaCreate, IdeaResponse, CommentCreate, CommentResponse,
 from ..services.ai_service import generate_idea_review, generate_remix_suggestions
 
 
-from cachetools import TTLCache
+from ..cache import feed_cache, trending_cache, invalidate_feed_cache, invalidate_trending_cache
 
 router = APIRouter()
-
-# Lightweight in-memory feed cache (TTL: 60 seconds, Cache Key: (page, limit))
-feed_cache = TTLCache(maxsize=128, ttl=60)
-
-# Lightweight in-memory trending ideas cache (TTL: 300 seconds, Cache Key: "trending")
-trending_cache = TTLCache(maxsize=1, ttl=300)
 
 
 @router.post("/ideas", response_model=IdeaResponse, status_code=status.HTTP_201_CREATED)
@@ -58,6 +52,7 @@ def create_idea(
 
 	db.add(new_idea)
 	db.commit()
+	invalidate_feed_cache()
 	db.refresh(new_idea)
 
 	return new_idea
@@ -166,6 +161,7 @@ def update_idea(
 		idea.tags.append(tag)
 
 	db.commit()
+	invalidate_feed_cache()
 	db.refresh(idea)
 
 	return idea
@@ -193,6 +189,7 @@ def delete_idea(
 
 	db.delete(idea)
 	db.commit()
+	invalidate_feed_cache()
 
 @router.get("/feed", response_model=list[IdeaResponse])
 def get_public_feed(
@@ -301,6 +298,7 @@ def like_idea(
 
 		db.add(notification)
 	db.commit()
+	invalidate_trending_cache()
 
 	return {"message": "Idea liked successfully"}
 
@@ -339,6 +337,7 @@ def create_comment(
 		)
 		db.add(notification)
 	db.commit()
+	invalidate_trending_cache()
 	db.refresh(new_comment)
 
 	return new_comment
@@ -390,6 +389,7 @@ def remix_idea(
 
 		db.add(notification)
 	db.commit()
+	invalidate_trending_cache()
 	db.refresh(new_idea)
 
 	return new_idea
