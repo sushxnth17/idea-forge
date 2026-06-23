@@ -667,7 +667,19 @@ async def generate_ai_review(
 			detail="Idea not found"
 		)
 
-	# Generate review using AI service (calls Groq API)
+	# 1. Check if the idea already has an AI review stored in the database (Cache check)
+	existing_review = (
+		db.query(AIReview)
+		.filter(AIReview.idea_id == idea_id)
+		.order_by(AIReview.created_at.desc())
+		.first()
+	)
+
+	# 2. If review exists: Return existing review immediately and do not call Groq
+	if existing_review:
+		return existing_review
+
+	# 3. If review does not exist: Generate review using existing AI service
 	try:
 		review_text = await generate_idea_review(idea.title, idea.description)
 	except ValueError as e:
@@ -681,6 +693,7 @@ async def generate_ai_review(
 			detail=str(e)
 		)
 
+	# Save the newly generated review to the database
 	new_review = AIReview(
 		idea_id=idea_id,
 		review_text=review_text
