@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session, joinedload, selectinload
 from sqlalchemy import or_, func
 from ..auth import get_current_user
 from ..database import get_db
-from ..models import (Idea, User, Tag, Like, Comment, Bookmark, Notification, Follow, AIReview, CollaborationRequest)
+from ..models import (Idea, User, Tag, Like, Comment, Bookmark, Notification, Follow, AIReview, CollaborationRequest, RemixSuggestion)
 from ..schemas import (IdeaCreate, IdeaResponse, CommentCreate, CommentResponse, BookmarkResponse, TagResponse, IdeaRemixTreeResponse, AIReviewResponse, CollaborationRequestCreate, CollaborationRequestResponse, RemixSuggestionsResponse, RemixCreate)
 from ..services.ai_service import generate_idea_review, generate_remix_suggestions
 
@@ -775,6 +775,18 @@ async def get_remix_suggestions_endpoint(
 			detail="You do not have permission to access this idea"
 		)
 
+	# 1. Check if suggestions already exist in the database (Cache check)
+	cached_suggestions = (
+		db.query(RemixSuggestion)
+		.filter(RemixSuggestion.idea_id == idea_id)
+		.all()
+	)
+
+	# 2. If suggestions exist: Return cached suggestions immediately and do not call Groq
+	if cached_suggestions:
+		return {"suggestions": cached_suggestions}
+
+	# 3. If suggestions do not exist: Generate suggestions using existing service
 	try:
 		suggestions = await generate_remix_suggestions(idea.title, idea.description)
 	except ValueError as e:
@@ -788,7 +800,19 @@ async def get_remix_suggestions_endpoint(
 			detail=str(e)
 		)
 
-	return {"suggestions": suggestions}
+	# 4. Save newly generated suggestions to the database
+	db_suggestions = []
+	for item in suggestions:
+		db_suggestion = RemixSuggestion(
+			idea_id=idea_id,
+			title=item["title"],
+			description=item["description"]
+		)
+		db.add(db_suggestion)
+		db_suggestions.append(db_suggestion)
+	db.commit()
+
+	return {"suggestions": db_suggestions}
 
 
 
