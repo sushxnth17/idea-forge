@@ -8,7 +8,12 @@ from ..schemas import (IdeaCreate, IdeaResponse, CommentCreate, CommentResponse,
 from ..services.ai_service import generate_idea_review, generate_remix_suggestions
 
 
+from cachetools import TTLCache
+
 router = APIRouter()
+
+# Lightweight in-memory feed cache (TTL: 60 seconds, Cache Key: (page, limit))
+feed_cache = TTLCache(maxsize=128, ttl=60)
 
 
 @router.post("/ideas", response_model=IdeaResponse, status_code=status.HTTP_201_CREATED)
@@ -192,6 +197,13 @@ def get_public_feed(
 	limit: int = 5,
 	db: Session = Depends(get_db),
 ):
+	cache_key = (page, limit)
+
+	# 1. Check if the feed is already cached (Cache hit)
+	if cache_key in feed_cache:
+		return feed_cache[cache_key]
+
+	# 2. Cache miss: Query the database
 	skip = (page - 1) * limit
 
 	# [EAGER LOADING] Eagerly load relationships to resolve N+1 queries when loading the public feed list
@@ -210,7 +222,13 @@ def get_public_feed(
 		.all()
 	)
 
-	return public_ideas
+	# 3. Convert database models to Pydantic models to avoid DetachedInstanceError on subsequent cache hits
+	serialized_ideas = [IdeaResponse.model_validate(idea) for idea in public_ideas]
+
+	# 4. Store the serialized feed response in the TTLCache
+	feed_cache[cache_key] = serialized_ideas
+
+	return serialized_ideas
 
 @router.get("/search/{tag_name}", response_model=list[IdeaResponse])
 def search_by_tag(
